@@ -358,15 +358,22 @@ export function PlayerPersonalScreen({
               )}
             </div>
           ) : (
-            /* Not My Turn: Atmospheric Sleep Screen */
-            <div className="text-center py-8 space-y-4">
-              <div className="w-16 h-16 mx-auto rounded-full bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center text-indigo-300 animate-pulse">
+            /* Not My Turn: Atmospheric Sleep Screen with clear active step indicators */
+            <div className="text-center py-6 sm:py-8 space-y-4">
+              <div className="w-16 h-16 mx-auto rounded-full bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center text-indigo-300 animate-pulse shadow-inner">
                 <Moon className="w-8 h-8" />
               </div>
-              <div className="space-y-1">
-                <h3 className="font-serif text-xl font-bold text-indigo-100">Mata Terpejam...</h3>
-                <p className="text-xs text-indigo-300/70 max-w-xs mx-auto">
-                  Malam sedang berlangsung. Tunggu giliran peran Anda dipanggil.
+              <div className="space-y-1.5">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 text-xs font-bold">
+                  <span>🌙 Langkah {gameState.activeNightStepIndex + 1} dari {gameState.currentNightSteps.length}</span>
+                </div>
+                <h3 className="font-serif text-xl font-extrabold text-indigo-100">
+                  {currentActiveRole ? `Giliran ${ROLES[currentActiveRole]?.name} Beraksi...` : "Mata Terpejam..."}
+                </h3>
+                <p className="text-xs text-indigo-300/80 max-w-sm mx-auto">
+                  {currentActiveRole 
+                    ? `Peran ${ROLES[currentActiveRole]?.name} sedang menentukan target di keheningan malam.`
+                    : "Malam sedang berlangsung. Tunggu giliran peran Anda dipanggil."}
                 </p>
               </div>
             </div>
@@ -374,18 +381,35 @@ export function PlayerPersonalScreen({
 
           {/* Host Next Step Controller */}
           {isHost && (
-            <div className="pt-3 border-t border-indigo-950 flex justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  audioEngine.playTap();
-                  onDispatchAction("ADVANCE_NIGHT_STEP");
-                }}
-                className="w-full sm:w-auto py-2.5 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-serif font-bold text-xs tracking-wide shadow-md transition-all flex items-center justify-center gap-2"
-              >
-                <span>Lanjut ke Peran Berikutnya / Sambut Pagi</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+            <div className="pt-4 border-t border-indigo-950/80 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+              <span className="text-[11px] text-indigo-300/80 font-medium">
+                Kontrol Host:
+              </span>
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => {
+                    audioEngine.playTap();
+                    onDispatchAction("ADVANCE_NIGHT_STEP");
+                  }}
+                  className="flex-1 sm:flex-initial py-3 px-4 rounded-xl bg-indigo-700/80 hover:bg-indigo-600 text-white font-serif font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                >
+                  <span>Lanjut Langkah ({gameState.activeNightStepIndex + 1}/{gameState.currentNightSteps.length})</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    audioEngine.playBell();
+                    onDispatchAction("RESOLVE_NIGHT");
+                  }}
+                  className="flex-1 sm:flex-initial py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-serif font-black text-xs shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                >
+                  <Sun className="w-4 h-4" />
+                  <span>Sambut Pagi ☀️</span>
+                </button>
+              </div>
             </div>
           )}
         </div>

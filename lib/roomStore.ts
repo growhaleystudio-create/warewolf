@@ -364,6 +364,17 @@ export function dispatchActionToRoom(
   const room = rooms.get(roomCode.toUpperCase().trim());
   if (!room) return false;
 
+  if (action.type === "RESOLVE_NIGHT") {
+    // Pastikan semua bot mengisi aksinya
+    room.gameState.currentNightSteps.forEach((step) => {
+      const botUpdates = generateAIBotNightActions(room.gameState, room.players, step);
+      room.gameState.nightActions = {
+        ...room.gameState.nightActions,
+        ...botUpdates,
+      };
+    });
+  }
+
   const nextState = gameReducer(room.gameState, action);
   room.gameState = nextState;
 

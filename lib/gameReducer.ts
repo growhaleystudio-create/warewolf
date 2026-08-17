@@ -22,6 +22,7 @@ export type GameAction =
   | { type: "START_NIGHT" }
   | { type: "SET_NIGHT_ACTION"; payload: Partial<NightActionsState> }
   | { type: "ADVANCE_NIGHT_STEP" }
+  | { type: "RESOLVE_NIGHT" }
   | { type: "PROCEED_TO_DAY_DISCUSSION" }
   | { type: "START_VOTING" }
   | { type: "CAST_VOTE"; payload: { voterId: string; targetId: string | null } }
@@ -197,6 +198,83 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       }));
 
       // Cek win condition setelah kematian malam
+      const winner = checkWinCondition(updatedPlayers);
+
+      if (winner) {
+        return {
+          ...state,
+          phase: "WINNER",
+          players: updatedPlayers,
+          morningDeaths: resolution.killedPlayerIds,
+          witchPotions: resolution.witchPotionsUpdated,
+          lastDoctorTargetId: state.nightActions.doctorTargetId,
+          lastBodyguardTargetId: state.nightActions.bodyguardTargetId,
+          winner,
+          historyLogs: [...state.historyLogs, ...newLogs],
+        };
+      }
+
+      if (deadHunter) {
+        return {
+          ...state,
+          phase: "HUNTER_REVENGE",
+          players: updatedPlayers,
+          morningDeaths: resolution.killedPlayerIds,
+          witchPotions: resolution.witchPotionsUpdated,
+          lastDoctorTargetId: state.nightActions.doctorTargetId,
+          lastBodyguardTargetId: state.nightActions.bodyguardTargetId,
+          hunterTriggerSource: "NIGHT",
+          hunterPlayerId: deadHunter.id,
+          historyLogs: [...state.historyLogs, ...newLogs],
+        };
+      }
+
+      return {
+        ...state,
+        phase: "MORNING_REVEAL",
+        players: updatedPlayers,
+        morningDeaths: resolution.killedPlayerIds,
+        witchPotions: resolution.witchPotionsUpdated,
+        lastDoctorTargetId: state.nightActions.doctorTargetId,
+        lastBodyguardTargetId: state.nightActions.bodyguardTargetId,
+        historyLogs: [...state.historyLogs, ...newLogs],
+      };
+    }
+
+    case "RESOLVE_NIGHT": {
+      const resolution = resolveNightCalculations(
+        state.players,
+        state.nightActions,
+        state.witchPotions
+      );
+
+      let updatedPlayers = state.players.map(p => {
+        const deathInfo = resolution.deathsDetail.find(d => d.playerId === p.id);
+        if (deathInfo) {
+          return {
+            ...p,
+            isAlive: false,
+            deathReason: deathInfo.reason,
+            deathRound: state.roundNumber,
+            deathPhase: 'NIGHT' as const,
+          };
+        }
+        return p;
+      });
+
+      const deadHunter = updatedPlayers.find(
+        p => resolution.killedPlayerIds.includes(p.id) && p.role === "HUNTER"
+      );
+
+      const newLogs = resolution.logs.map((logMsg, i) => ({
+        id: `log-${Date.now()}-${i}`,
+        roundNumber: state.roundNumber,
+        phase: "NIGHT" as const,
+        title: `Malam ${state.roundNumber}`,
+        description: logMsg,
+        timestamp: Date.now(),
+      }));
+
       const winner = checkWinCondition(updatedPlayers);
 
       if (winner) {
