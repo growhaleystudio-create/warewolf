@@ -8,43 +8,48 @@ class AudioEngine {
   private bgmAudio: HTMLAudioElement | null = null;
   private isBgmPlaying: boolean = false;
 
-  constructor() {
-    if (typeof window !== "undefined") {
-      this.initBGM();
+  private initBGM(): HTMLAudioElement | null {
+    if (typeof window === "undefined") return null;
+    if (!this.bgmAudio) {
+      try {
+        const audio = new Audio("/audio/bgm.mp3");
+        audio.loop = true;
+        audio.volume = 0.22;
+        audio.preload = "none";
+        this.bgmAudio = audio;
+      } catch (e) {
+        console.warn("BGM initialization error:", e);
+      }
     }
-  }
-
-  private initBGM() {
-    if (typeof window === "undefined" || this.bgmAudio) return;
-    try {
-      this.bgmAudio = new Audio("/audio/bgm.mp3");
-      this.bgmAudio.loop = true;
-      this.bgmAudio.volume = 0.22;
-      this.bgmAudio.preload = "none";
-    } catch (e) {
-      console.warn("BGM initialization deferred:", e);
-    }
+    return this.bgmAudio;
   }
 
   private initContext(): AudioContext | null {
     if (typeof window === "undefined") return null;
-    if (!this.ctx) {
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioContextClass) {
-        this.ctx = new AudioContextClass();
+    try {
+      if (!this.ctx) {
+        const AudioContextClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (AudioContextClass) {
+          this.ctx = new AudioContextClass();
+        }
       }
-    }
-    if (this.ctx && this.ctx.state === "suspended") {
-      this.ctx.resume();
+      if (this.ctx && this.ctx.state === "suspended") {
+        this.ctx.resume().catch(() => {});
+      }
+    } catch {
+      return null;
     }
     return this.ctx;
   }
 
   public setMuted(muted: boolean) {
     this.isMuted = muted;
-    if (this.bgmAudio) {
+    const bgm = this.initBGM();
+    if (bgm) {
       if (muted) {
-        this.bgmAudio.pause();
+        bgm.pause();
         this.isBgmPlaying = false;
       } else {
         this.playBGM();
@@ -58,198 +63,190 @@ class AudioEngine {
 
   public playBGM() {
     if (this.isMuted || typeof window === "undefined") return;
-    if (!this.bgmAudio) {
-      this.initBGM();
-    }
-    if (this.bgmAudio) {
-      this.bgmAudio.play().then(() => {
+    const bgm = this.initBGM();
+    if (bgm) {
+      bgm.play().then(() => {
         this.isBgmPlaying = true;
       }).catch(() => {
-        // Autoplay may be blocked before first user gesture
+        // Autoplay policy may defer until first user gesture
       });
     }
   }
 
   public pauseBGM() {
-    if (this.bgmAudio) {
-      this.bgmAudio.pause();
+    const bgm = this.initBGM();
+    if (bgm) {
+      bgm.pause();
       this.isBgmPlaying = false;
     }
   }
 
-  /**
-   * Sound: Suara ketukan tombol / UI Tap
-   */
   public playTap() {
-    this.playBGM(); // Start BGM on first interaction if not playing
+    this.playBGM();
     if (this.isMuted) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(480, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(240, ctx.currentTime + 0.05);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(480, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(240, ctx.currentTime + 0.05);
 
-    gain.gain.setValueAtTime(0.12, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
 
-    osc.start();
-    osc.stop(ctx.currentTime + 0.05);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.05);
+    } catch {}
   }
 
-  /**
-   * Sound: Card Reveal Flip Sound
-   */
   public playCardFlip() {
     if (this.isMuted) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
-    osc.type = "triangle";
-    osc.frequency.setValueAtTime(180, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.12);
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(180, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.12);
 
-    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
 
-    osc.start();
-    osc.stop(ctx.currentTime + 0.12);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.12);
+    } catch {}
   }
 
-  /**
-   * Sound: Lonceng Balai Desa (Village Bell)
-   */
   public playBell() {
     if (this.isMuted) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
-    const frequencies = [440, 880, 1320];
-    const now = ctx.currentTime;
+    try {
+      const frequencies = [440, 880, 1320];
+      const now = ctx.currentTime;
 
-    frequencies.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+      frequencies.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
 
-      osc.type = idx === 0 ? "sine" : "triangle";
-      osc.frequency.setValueAtTime(freq, now);
+        osc.type = idx === 0 ? "sine" : "triangle";
+        osc.frequency.setValueAtTime(freq, now);
 
-      const initialGain = 0.2 / (idx + 1);
-      gain.gain.setValueAtTime(initialGain, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+        const initialGain = 0.2 / (idx + 1);
+        gain.gain.setValueAtTime(initialGain, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
 
-      osc.start(now);
-      osc.stop(now + 1.8);
-    });
+        osc.start(now);
+        osc.stop(now + 1.8);
+      });
+    } catch {}
   }
 
-  /**
-   * Sound: Detak Jantung Dramatis (Heartbeat)
-   */
   public playHeartbeat() {
     if (this.isMuted) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
-    const now = ctx.currentTime;
+    try {
+      const now = ctx.currentTime;
+      const playBeat = (time: number, freq: number, duration: number, vol: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
 
-    const playBeat = (time: number, freq: number, duration: number, vol: number) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, time);
+        osc.frequency.exponentialRampToValueAtTime(30, time + duration);
 
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, time);
-      osc.frequency.exponentialRampToValueAtTime(30, time + duration);
+        gain.gain.setValueAtTime(vol, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
 
-      gain.gain.setValueAtTime(vol, time);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        osc.start(time);
+        osc.stop(time + duration);
+      };
 
-      osc.start(time);
-      osc.stop(time + duration);
-    };
-
-    playBeat(now, 75, 0.15, 0.35);
-    playBeat(now + 0.18, 65, 0.18, 0.25);
+      playBeat(now, 75, 0.15, 0.35);
+      playBeat(now + 0.18, 65, 0.18, 0.25);
+    } catch {}
   }
 
-  /**
-   * Sound: Suara Malam Tiba (Chime)
-   */
   public playNightChime() {
     if (this.isMuted) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
-    const notes = [220, 261.63, 329.63, 440];
-    notes.forEach((note, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const startTime = ctx.currentTime + i * 0.15;
+    try {
+      const notes = [220, 261.63, 329.63, 440];
+      notes.forEach((note, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const startTime = ctx.currentTime + i * 0.15;
 
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(note, startTime);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(note, startTime);
 
-      gain.gain.setValueAtTime(0.15, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 1.2);
+        gain.gain.setValueAtTime(0.15, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 1.2);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
 
-      osc.start(startTime);
-      osc.stop(startTime + 1.2);
-    });
+        osc.start(startTime);
+        osc.stop(startTime + 1.2);
+      });
+    } catch {}
   }
 
-  /**
-   * Sound: Fanfare Kemenangan (Victory)
-   */
   public playVictory() {
     if (this.isMuted) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
-    const melody = [
-      { note: 261.63, time: 0.0, dur: 0.15 },
-      { note: 329.63, time: 0.15, dur: 0.15 },
-      { note: 392.00, time: 0.30, dur: 0.15 },
-      { note: 523.25, time: 0.45, dur: 0.60 },
-    ];
+    try {
+      const melody = [
+        { note: 261.63, time: 0.0, dur: 0.15 },
+        { note: 329.63, time: 0.15, dur: 0.15 },
+        { note: 392.00, time: 0.30, dur: 0.15 },
+        { note: 523.25, time: 0.45, dur: 0.60 },
+      ];
 
-    melody.forEach(({ note, time, dur }) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const startTime = ctx.currentTime + time;
+      melody.forEach(({ note, time, dur }) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const startTime = ctx.currentTime + time;
 
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(note, startTime);
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(note, startTime);
 
-      gain.gain.setValueAtTime(0.25, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + dur);
+        gain.gain.setValueAtTime(0.25, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + dur);
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
 
-      osc.start(startTime);
-      osc.stop(startTime + dur);
-    });
+        osc.start(startTime);
+        osc.stop(startTime + dur);
+      });
+    } catch {}
   }
 
   public startAmbient(type: 'NIGHT' | 'DAY') {
@@ -257,7 +254,7 @@ class AudioEngine {
   }
 
   public stopAmbient() {
-    // No-op (handled by BGM)
+    // Handled by BGM
   }
 }
 

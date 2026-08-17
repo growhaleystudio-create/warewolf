@@ -35,6 +35,16 @@ export interface Player {
   deathPhase?: 'NIGHT' | 'DAY';
 }
 
+export interface RoomPlayer {
+  id: string;
+  name: string;
+  role: RoleId;
+  isAlive: boolean;
+  isHost: boolean;
+  connected: boolean;
+  lastPing: number;
+}
+
 export type GamePhase = 
   | 'SETUP' 
   | 'DEAL' 

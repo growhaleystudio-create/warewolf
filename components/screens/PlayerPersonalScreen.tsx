@@ -5,10 +5,10 @@ import {
   GameState, 
   Player, 
   RoleId, 
-  NightActionsState 
+  NightActionsState,
+  RoomPlayer
 } from "@/lib/types";
 import { ROLES } from "@/lib/roles";
-import { RoomPlayer } from "@/lib/roomStore";
 import { RoleIcon } from "../illustrations/RoleIcon";
 import { PlayerCard } from "../ui/PlayerCard";
 import { Timer } from "../ui/Timer";

@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { GameState, RoleId, GameSettings, ChatMessage } from "@/lib/types";
+import { GameState, RoleId, GameSettings, ChatMessage, RoomPlayer } from "@/lib/types";
 import { INITIAL_GAME_STATE } from "@/lib/gameReducer";
-import { RoomPlayer } from "@/lib/roomStore";
 import { LobbyAuthScreen } from "@/components/screens/LobbyAuthScreen";
 import { PlayerPersonalScreen } from "@/components/screens/PlayerPersonalScreen";
 import { AudioToggle } from "@/components/ui/AudioToggle";
@@ -13,6 +12,7 @@ function WerewolfGameApp() {
   const searchParams = useSearchParams();
   const queryRoom = searchParams.get("room");
 
+  const [mounted, setMounted] = useState(false);
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
@@ -23,8 +23,8 @@ function WerewolfGameApp() {
   const [playersInRoom, setPlayersInRoom] = useState<Array<{ id: string; name: string; isHost: boolean }>>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Restore session from localStorage on mount
   useEffect(() => {
+    setMounted(true);
     const savedRoom = localStorage.getItem("WEREWOLF_MULTI_ROOM");
     const savedPlayer = localStorage.getItem("WEREWOLF_MULTI_PLAYER_ID");
 
@@ -210,6 +210,14 @@ function WerewolfGameApp() {
 
   const isNightPhase = gameState.phase === "NIGHT";
   const isInActiveGame = roomCode && playerId && myPlayer && gameState.phase !== "SETUP";
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-stone-950 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <main

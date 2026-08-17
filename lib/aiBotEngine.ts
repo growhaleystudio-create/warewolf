@@ -1,5 +1,4 @@
-import { GameState, RoleId, Player, ChatMessage } from "./types";
-import { RoomPlayer } from "./roomStore";
+import { GameState, RoleId, Player, ChatMessage, RoomPlayer } from "./types";
 
 const BOT_NAMES = [
   "Bot Arthur",
