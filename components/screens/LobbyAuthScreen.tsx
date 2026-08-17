@@ -283,28 +283,28 @@ export function LobbyAuthScreen({
     <div className="w-full max-w-xl mx-auto p-4 sm:p-6 space-y-6 animate-fadeIn">
       {/* Header Banner */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>Multiplayer Multi-Perangkat (HP/Laptop)</span>
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] sm:text-xs font-semibold uppercase tracking-wider whitespace-nowrap">
+          <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+          <span>Multiplayer & Mode Bot AI</span>
         </div>
 
-        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-amber-100">
+        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-amber-100 tracking-tight">
           WEREWOLF DESA
         </h1>
-        <p className="text-stone-300 text-xs sm:text-sm max-w-md mx-auto">
+        <p className="text-stone-300 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
           Masuk dan bermain bersama teman dengan halaman dan peran rahasia di perangkat masing-masing!
         </p>
 
         {/* Quick 1-Click Solo vs AI Button */}
         {onStartSoloGame && (
-          <div className="pt-2 flex flex-col items-center gap-2">
+          <div className="pt-1 flex flex-col items-center gap-2">
             <button
               type="button"
               onClick={handleSoloClick}
-              className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white font-serif font-bold text-sm tracking-wide shadow-xl shadow-indigo-500/25 border border-indigo-400/40 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2.5"
+              className="w-full py-3 sm:py-3.5 px-4 sm:px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white font-serif font-bold text-xs sm:text-sm tracking-wide shadow-xl shadow-indigo-500/25 border border-indigo-400/40 transition-all hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2"
             >
-              <Gamepad2 className="w-5 h-5 text-amber-300" />
-              <span>🎮 MAIN SOLO VS BOT AI (1-KLIK INSTAN)</span>
+              <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 shrink-0" />
+              <span className="whitespace-nowrap">Main Solo vs Bot AI (1-Klik Instan)</span>
             </button>
           </div>
         )}
@@ -316,7 +316,7 @@ export function LobbyAuthScreen({
               audioEngine.playTap();
               setShowRoleGuide(true);
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-800/80 hover:bg-stone-700 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-800/80 hover:bg-stone-700 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-all whitespace-nowrap"
           >
             <BookOpen className="w-3.5 h-3.5" />
             <span>Pelajari Aturan & Peran</span>
@@ -326,21 +326,21 @@ export function LobbyAuthScreen({
 
       {/* Tab Switcher */}
       <div className="flex justify-center">
-        <div className="bg-stone-900/90 border border-stone-700/80 rounded-2xl p-1.5 flex gap-1 shadow-md">
+        <div className="bg-stone-900/90 border border-stone-700/80 rounded-2xl p-1.5 flex gap-1 shadow-md w-full max-w-sm">
           <button
             type="button"
             onClick={() => {
               audioEngine.playTap();
               setTab("JOIN");
             }}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
               tab === "JOIN"
                 ? "bg-amber-500 text-stone-950 font-bold shadow-md"
                 : "text-stone-300 hover:text-white"
             }`}
           >
-            <LogIn className="w-4 h-4" />
-            <span>Gabung Ruangan</span>
+            <LogIn className="w-3.5 h-3.5 shrink-0" />
+            <span>Gabung Ruang</span>
           </button>
 
           <button
@@ -349,14 +349,14 @@ export function LobbyAuthScreen({
               audioEngine.playTap();
               setTab("CREATE");
             }}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
               tab === "CREATE"
                 ? "bg-amber-500 text-stone-950 font-bold shadow-md"
                 : "text-stone-300 hover:text-white"
             }`}
           >
-            <PlusCircle className="w-4 h-4" />
-            <span>Buat Ruangan Baru (Host)</span>
+            <PlusCircle className="w-3.5 h-3.5 shrink-0" />
+            <span>Buat Ruang (Host)</span>
           </button>
         </div>
       </div>
