@@ -44,10 +44,9 @@ export default function RootLayout({
           <img
             src="/bg/village_bg.jpg"
             alt="Spooky Gothic Village Atmosphere"
-            className="w-full h-full object-cover object-center opacity-30 scale-105 filter brightness-75 contrast-125"
+            className="w-full h-full object-cover object-center opacity-65 filter brightness-95 contrast-115"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/90 via-stone-950/70 to-stone-950/95" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-stone-950/40 to-stone-950/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-stone-950/30 via-transparent to-stone-950/50" />
         </div>
 
         <div className="relative z-10 min-h-screen flex flex-col justify-between">

@@ -271,6 +271,7 @@ function WerewolfGameApp() {
             onDispatchAction={handleDispatchAction}
             onSendChatMessage={handleSendChatMessage}
             onRestartGame={handleRestartGame}
+            onLeaveRoom={handleLeaveRoom}
           />
         )}
       </div>

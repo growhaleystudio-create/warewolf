@@ -54,11 +54,11 @@
   animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Starry Night Sky Ambient Glow */
+/* Starry Night Sky Ambient Glow with transparency */
 .night-bg {
-  background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0f172a 50%, #030712 100%);
+  background: radial-gradient(circle at 50% 20%, rgba(30, 27, 75, 0.45) 0%, rgba(15, 23, 42, 0.55) 50%, rgba(3, 7, 18, 0.7) 100%);
 }
 
 .day-bg {
-  background: radial-gradient(circle at 50% 10%, #451a03 0%, #1c1917 40%, #0c0a09 100%);
+  background: radial-gradient(circle at 50% 10%, rgba(69, 26, 3, 0.4) 0%, rgba(28, 25, 23, 0.55) 40%, rgba(12, 10, 9, 0.7) 100%);
 }

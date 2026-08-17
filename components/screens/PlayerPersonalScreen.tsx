@@ -34,7 +34,8 @@ import {
   RotateCcw,
   Check,
   BookOpen,
-  MessageSquare
+  MessageSquare,
+  Home
 } from "lucide-react";
 import { audioEngine } from "@/lib/audioEngine";
 
@@ -48,6 +49,7 @@ interface PlayerPersonalScreenProps {
   onDispatchAction: (type: string, payload?: unknown) => void;
   onSendChatMessage: (text: string) => void;
   onRestartGame: () => void;
+  onLeaveRoom?: () => void;
 }
 
 export function PlayerPersonalScreen({
@@ -60,6 +62,7 @@ export function PlayerPersonalScreen({
   onDispatchAction,
   onSendChatMessage,
   onRestartGame,
+  onLeaveRoom,
 }: PlayerPersonalScreenProps) {
   const [showSecretRoleModal, setShowSecretRoleModal] = useState(false);
   const [showRoleGuide, setShowRoleGuide] = useState(false);
@@ -173,7 +176,7 @@ export function PlayerPersonalScreen({
               audioEngine.playTap();
               setShowRoleGuide(true);
             }}
-            className="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-600 text-stone-300 text-xs font-semibold transition-all active:scale-95"
+            className="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-stone-800/90 hover:bg-stone-700 border border-stone-600 text-stone-300 text-xs font-semibold transition-all active:scale-95 shadow-sm"
             title="Buka Panduan Peran"
           >
             <BookOpen className="w-3.5 h-3.5 text-amber-400" />
@@ -186,10 +189,25 @@ export function PlayerPersonalScreen({
               audioEngine.playCardFlip();
               setShowSecretRoleModal(true);
             }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-semibold transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-semibold transition-all active:scale-95 shadow-sm"
           >
             <Eye className="w-3.5 h-3.5" />
             <span>Peran Saya</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm("Keluar dari permainan dan kembali ke Beranda?")) {
+                audioEngine.playTap();
+                onLeaveRoom?.();
+              }
+            }}
+            className="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-stone-800/90 hover:bg-red-950/80 border border-stone-600 hover:border-red-500/50 text-stone-300 hover:text-red-300 text-xs font-semibold transition-all active:scale-95 shadow-sm"
+            title="Kembali ke Beranda / Keluar Ruangan"
+          >
+            <Home className="w-3.5 h-3.5 text-rose-400" />
+            <span className="hidden sm:inline">Beranda</span>
           </button>
         </div>
       </div>
@@ -631,28 +649,47 @@ export function PlayerPersonalScreen({
             </div>
           </div>
 
-          <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
+          <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {isHost ? (
+              <button
+                type="button"
+                onClick={onRestartGame}
+                className="w-full py-3.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-serif font-black text-xs sm:text-sm tracking-wide shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>LANJUT MAIN LAGI DI SINI</span>
+              </button>
+            ) : (
+              <div className="p-3 bg-stone-950/80 rounded-2xl border border-stone-800 text-xs text-amber-300 font-semibold flex items-center justify-center">
+                <span>⏳ Menunggu Host memulai ulang...</span>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                audioEngine.playTap();
+                onLeaveRoom?.();
+              }}
+              className="w-full py-3.5 px-4 rounded-2xl bg-stone-800/90 hover:bg-stone-700 border border-stone-600 text-stone-100 font-serif font-bold text-xs sm:text-sm tracking-wide shadow-md active:scale-95 flex items-center justify-center gap-2"
+            >
+              <Home className="w-4 h-4 text-amber-400" />
+              <span>KEMBALI KE BERANDA</span>
+            </button>
+          </div>
+
+          <div className="pt-1">
             <button
               type="button"
               onClick={() => {
                 audioEngine.playTap();
                 setShowEpilogue(true);
               }}
-              className="flex-1 py-3 px-4 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-xs font-semibold text-amber-300 flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
+              className="w-full py-2.5 px-4 rounded-xl bg-stone-950/70 hover:bg-stone-800 border border-stone-800 text-xs font-semibold text-amber-300/90 flex items-center justify-center gap-1.5 transition-all active:scale-95"
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>📖 Baca Ulang Epilog Kemenangan</span>
+              <span>📖 Baca Ulang Epilog Cerita Kemenangan</span>
             </button>
-
-            {isHost && (
-              <button
-                type="button"
-                onClick={onRestartGame}
-                className="flex-1 py-3.5 px-6 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-serif font-bold text-xs shadow-md active:scale-95"
-              >
-                MAIN LAGI DI RUANGAN INI
-              </button>
-            )}
           </div>
         </div>
       )}
