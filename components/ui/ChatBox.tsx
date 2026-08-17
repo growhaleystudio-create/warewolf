@@ -28,14 +28,16 @@ export function ChatBox({
   className = "",
 }: ChatBoxProps) {
   const [inputText, setInputText] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const prevMsgLengthRef = useRef<number>(0);
 
   useEffect(() => {
-    scrollToBottom();
+    if (messages.length > prevMsgLengthRef.current) {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+      }
+      prevMsgLengthRef.current = messages.length;
+    }
   }, [messages]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -67,7 +69,10 @@ export function ChatBox({
       </div>
 
       {/* Messages Stream */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[180px] max-h-[70vh] lg:max-h-none text-xs">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[180px] max-h-[70vh] lg:max-h-none text-xs"
+      >
         {messages.length === 0 ? (
           <div className="text-center py-6 text-stone-500 text-xs italic">
             Belum ada obrolan. Mulai diskusi atau tunggu warga lain bersuara!
@@ -119,7 +124,6 @@ export function ChatBox({
             );
           })
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Quick Reaction Buttons */}
