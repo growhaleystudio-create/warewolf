@@ -10,6 +10,7 @@ import {
 } from "@/lib/types";
 import { ROLES } from "@/lib/roles";
 import { RoleIcon } from "../illustrations/RoleIcon";
+import { RoleIllustration } from "../illustrations/RoleIllustration";
 import { PlayerCard } from "../ui/PlayerCard";
 import { Timer } from "../ui/Timer";
 import { RoleGuideModal } from "../ui/RoleGuideModal";
@@ -193,14 +194,12 @@ export function PlayerPersonalScreen({
       {/* Secret Role Peek Modal */}
       {showSecretRoleModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
-          <div className="w-full max-w-sm bg-gradient-to-b from-stone-900 to-stone-950 border-2 border-amber-500/60 rounded-3xl p-6 text-center space-y-4 shadow-2xl">
-            <div className="w-24 h-24 mx-auto rounded-2xl bg-stone-950 border border-amber-500/40 flex items-center justify-center p-2 shadow-inner">
-              <RoleIcon role={myPlayer.role} className="w-16 h-16" />
-            </div>
+          <div className="w-full max-w-sm bg-gradient-to-b from-stone-900 to-stone-950 border-2 border-amber-500/60 rounded-3xl p-5 text-center space-y-3.5 shadow-2xl">
+            <RoleIllustration role={myPlayer.role} size="md" className="mx-auto shadow-2xl" />
 
             <div className="space-y-1">
-              <span className="text-[11px] uppercase tracking-widest text-stone-400">Identitas Rahasia Anda:</span>
-              <h3 className="font-serif text-2xl font-extrabold text-amber-200">{myRoleDef.name}</h3>
+              <span className="text-[10px] uppercase tracking-widest text-stone-400">Identitas Rahasia Anda:</span>
+              <h3 className="font-serif text-xl font-extrabold text-amber-200">{myRoleDef.name}</h3>
               <div className="inline-block px-3 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
                 {myRoleDef.faction === "WEREWOLF" ? "Faksi Serigala (Jahat)" : myRoleDef.faction === "NEUTRAL" ? "Faksi Netral" : "Faksi Warga Desa (Baik)"}
               </div>

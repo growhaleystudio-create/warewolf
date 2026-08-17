@@ -4,6 +4,7 @@ import React from "react";
 import { Player } from "@/lib/types";
 import { ROLES } from "@/lib/roles";
 import { RoleIcon } from "../illustrations/RoleIcon";
+import { RoleIllustration } from "../illustrations/RoleIllustration";
 import { Eye, EyeOff, UserCheck, ArrowRight, ShieldAlert } from "lucide-react";
 import { audioEngine } from "@/lib/audioEngine";
 
@@ -103,9 +104,7 @@ export function RoleDealScreen({
 
           {/* Role Illustration & Title */}
           <div className="space-y-4">
-            <div className="w-32 h-32 mx-auto rounded-2xl bg-stone-950/80 border border-amber-500/30 flex items-center justify-center p-3 shadow-inner">
-              <RoleIcon role={currentPlayer.role} className="w-24 h-24" />
-            </div>
+            <RoleIllustration role={currentPlayer.role} size="md" className="mx-auto shadow-2xl" />
 
             <div className="space-y-1">
               <span className="text-xs text-stone-400 font-medium">Peran Rahasia {currentPlayer.name}:</span>

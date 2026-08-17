@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { RoleId } from "@/lib/types";
 import { ROLES } from "@/lib/roles";
 import { RoleIcon } from "../illustrations/RoleIcon";
+import { RoleIllustration } from "../illustrations/RoleIllustration";
 import { X, BookOpen, Sparkles, Shield, Skull, HelpCircle, Trophy } from "lucide-react";
 import { audioEngine } from "@/lib/audioEngine";
 
@@ -141,12 +142,10 @@ export function RoleGuideModal({ isOpen, onClose }: RoleGuideModalProps) {
           {/* Right Detail Pane */}
           <div className="md:col-span-8 p-5 sm:p-6 space-y-5 bg-stone-900 overflow-y-auto">
             {/* Role Header */}
-            <div className="flex items-center gap-4 pb-4 border-b border-stone-800">
-              <div className="w-16 h-16 rounded-2xl bg-stone-950 border border-amber-500/30 flex items-center justify-center p-2 shrink-0 shadow-inner">
-                <RoleIcon role={selectedRoleId} className="w-12 h-12" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pb-4 border-b border-stone-800">
+              <RoleIllustration role={selectedRoleId} size="sm" className="shrink-0 w-28 h-36" />
+              <div className="flex-1 text-center sm:text-left">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                   <h4 className="font-serif text-2xl font-extrabold text-amber-200">{roleDef.name}</h4>
                   <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
                     roleDef.faction === "WEREWOLF"
@@ -158,7 +157,7 @@ export function RoleGuideModal({ isOpen, onClose }: RoleGuideModalProps) {
                     {roleDef.faction === "WEREWOLF" ? "Faksi Serigala" : roleDef.faction === "NEUTRAL" ? "Faksi Netral" : "Faksi Desa"}
                   </span>
                 </div>
-                <p className="text-xs text-stone-300 mt-1">{roleDef.description}</p>
+                <p className="text-xs text-stone-300 mt-1.5 leading-relaxed">{roleDef.description}</p>
               </div>
             </div>
 
