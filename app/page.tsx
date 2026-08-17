@@ -54,19 +54,22 @@ function WerewolfGameApp() {
         return;
       }
 
-      const data = await res.json();
-      setIsHost(data.isHost);
-      setMyPlayer(data.myPlayer);
-      setGameState(data.gameState);
-      setCurrentActiveRole(data.currentActiveRole);
-      setTeammateWerewolves(data.teammateWerewolves || []);
+      const json = await res.json();
+      const room = json.data || json;
+      if (!room || !room.gameState) return;
 
-      if (data.gameState.players) {
+      setIsHost(!!room.isHost);
+      setMyPlayer(room.myPlayer || null);
+      setGameState(room.gameState);
+      setCurrentActiveRole(room.currentActiveRole || null);
+      setTeammateWerewolves(room.teammateWerewolves || []);
+
+      if (room.gameState?.players) {
         setPlayersInRoom(
-          data.gameState.players.map((p: { id: string; name: string }) => ({
+          room.gameState.players.map((p: { id: string; name: string }) => ({
             id: p.id,
             name: p.name,
-            isHost: p.id === data.gameState.players[0]?.id,
+            isHost: p.id === room.gameState.players[0]?.id,
           }))
         );
       }

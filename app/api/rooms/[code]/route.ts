@@ -20,7 +20,7 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      data: roomData,
+      ...roomData,
     });
   } catch (error) {
     console.error("Error fetching room:", error);
