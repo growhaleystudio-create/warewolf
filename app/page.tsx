@@ -36,6 +36,8 @@ function WerewolfGameApp() {
     }
   }, [queryRoom]);
 
+  const consecutive404Ref = React.useRef(0);
+
   // Polling Sync Room State every 1.5s
   const syncRoom = useCallback(async () => {
     if (!roomCode || !playerId) return;
@@ -44,16 +46,20 @@ function WerewolfGameApp() {
       const res = await fetch(`/api/rooms/${roomCode}?playerId=${playerId}`);
       if (!res.ok) {
         if (res.status === 404) {
-          localStorage.removeItem("WEREWOLF_MULTI_ROOM");
-          localStorage.removeItem("WEREWOLF_MULTI_PLAYER_ID");
-          setRoomCode(null);
-          setPlayerId(null);
-          setMyPlayer(null);
-          setGameState(INITIAL_GAME_STATE);
+          consecutive404Ref.current += 1;
+          if (consecutive404Ref.current >= 4) {
+            localStorage.removeItem("WEREWOLF_MULTI_ROOM");
+            localStorage.removeItem("WEREWOLF_MULTI_PLAYER_ID");
+            setRoomCode(null);
+            setPlayerId(null);
+            setMyPlayer(null);
+            setGameState(INITIAL_GAME_STATE);
+          }
         }
         return;
       }
 
+      consecutive404Ref.current = 0;
       const json = await res.json();
       const room = json.data || json;
       if (!room || !room.gameState) return;

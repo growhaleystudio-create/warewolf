@@ -49,9 +49,7 @@ declare global {
 }
 
 const rooms: Map<string, GameRoom> = global.__werewolf_rooms || new Map();
-if (process.env.NODE_ENV !== "production") {
-  global.__werewolf_rooms = rooms;
-}
+global.__werewolf_rooms = rooms;
 
 function generateRoomCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -363,6 +361,10 @@ export function dispatchActionToRoom(
 ): boolean {
   const room = rooms.get(roomCode.toUpperCase().trim());
   if (!room) return false;
+
+  if (action.type === "RESTART_GAME") {
+    return startRoomGame(room.roomCode, room.hostPlayerId);
+  }
 
   if (action.type === "RESOLVE_NIGHT") {
     // Pastikan semua bot mengisi aksinya

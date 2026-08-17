@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   GameState, 
   Player, 
@@ -72,6 +72,21 @@ export function PlayerPersonalScreen({
   const [seerInspectionResult, setSeerInspectionResult] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [myVoteTargetId, setMyVoteTargetId] = useState<string | null>(null);
+
+  // Otomatis buka Epilog saat permainan selesai & ada pemenang
+  useEffect(() => {
+    if (gameState.phase === "WINNER" && gameState.winner) {
+      setShowEpilogue(true);
+      audioEngine.playVictory();
+    }
+  }, [gameState.phase, gameState.winner]);
+
+  // Otomatis buka Prolog di ronde 1 malam pertama
+  useEffect(() => {
+    if (gameState.phase === "NIGHT" && gameState.roundNumber === 1) {
+      setShowPrologue(true);
+    }
+  }, [gameState.phase, gameState.roundNumber]);
 
   const myRoleDef = ROLES[myPlayer.role];
   const isMyTurnAtNight = gameState.phase === "NIGHT" && currentActiveRole === myPlayer.role && myPlayer.isAlive;
