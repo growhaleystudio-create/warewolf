@@ -48,6 +48,7 @@ Game Werewolf sebagai moderator otomatis untuk grup nyata bermain di satu layar 
   - Pemburu → tidak ada aksi malam
 - Pemain yang perannya dipanggil membuka mata dan menentukan pilihan di layar.
 - Bot menghitung hasil (membunuh vs penyembuhan/perlindungan/racun penyihir) lalu mengumumkan korban.
+- Urutan resolusi malam: racun penyihir diterapkan dulu (tidak bisa di-save), lalu serangan serigala yang bisa ditahan oleh penyembuhan dokter, perlindungan bodyguard, atau ramuan penyembuh penyihir. Jika korban serigala selamat, korban ditampilkan sebagai "dimakan" pada log tapi tidak ada pemain yang mati malam itu.
 
 ### Fase Siang (layar terang)
 - Diskusi bebas dengan timer.
@@ -58,7 +59,7 @@ Game Werewolf sebagai moderator otomatis untuk grup nyata bermain di satu layar 
 ### Kondisi Menang
 - Desa menang: semua serigala mati.
 - Serigala menang: jumlah serigala ≥ jumlah desa.
-- Jester menang: dirinya digantung (pemenang khusus).
+- Jester menang: jika dirinya digantung di siang hari, jester menang terlepas dari kondisi faction lain (pemenang khusus; game tetap berlanjut/berakhir sesuai aturan umum).
 
 ## Struktur UI
 
@@ -77,7 +78,7 @@ Visual: palet hangat (krem, cokelat, hijau rumput, oranye senja); ilustrasi pera
 
 - Day: loop arpeggio santai bernuansa pedesaan.
 - Night: jangkrik + senar rendah tenang.
-- Efek titilk saat mengetuk pilihan.
+- Efek ketukan lembut saat mengetuk pilihan.
 - Lonceng desa saat timer habis.
 - Detak dramatis saat reveal korban, fanfare kecil saat menang.
 - Tombol mute; jika audio tidak tersedia game tetap berjalan.
