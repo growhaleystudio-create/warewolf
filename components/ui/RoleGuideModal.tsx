@@ -92,7 +92,7 @@ export function RoleGuideModal({ isOpen, onClose }: RoleGuideModalProps) {
           <div className="flex items-center gap-2 text-amber-300">
             <BookOpen className="w-5 h-5 text-amber-400" />
             <h3 className="font-serif font-bold text-base sm:text-lg text-stone-100">
-              Ensiklopedia & Panduan Peran Werewolf
+              Ensiklopedia & Panduan Peran — Lembah Bayang
             </h3>
           </div>
           <button

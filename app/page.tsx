@@ -280,8 +280,8 @@ function WerewolfGameApp() {
       <AudioToggle />
 
       {/* Footer Branding */}
-      <footer className="relative z-10 text-center py-2 text-[11px] text-stone-500 font-mono">
-        Werewolf Online Desa • Multiplayer Multi-Perangkat & AI Solo
+      <footer className="relative z-10 text-center py-2 text-[11px] text-stone-500 font-mono tracking-wider">
+        Lembah Bayang: Werewolf Chronicles • Multiplayer Multi-Perangkat & AI Solo
       </footer>
     </main>
   );

@@ -288,9 +288,14 @@ export function LobbyAuthScreen({
           <span>Multiplayer & Mode Bot AI</span>
         </div>
 
-        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-amber-100 tracking-tight">
-          WEREWOLF DESA
-        </h1>
+        <div className="space-y-1">
+          <h1 className="font-serif text-3xl sm:text-5xl font-black text-amber-100 tracking-tight">
+            LEMBAH BAYANG
+          </h1>
+          <p className="text-amber-400 font-serif text-xs sm:text-sm tracking-[0.25em] uppercase font-extrabold drop-shadow">
+            Werewolf Chronicles
+          </p>
+        </div>
         <p className="text-stone-300 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
           Masuk dan bermain bersama teman dengan halaman dan peran rahasia di perangkat masing-masing!
         </p>

@@ -15,11 +15,11 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Werewolf Desa — Companion & Auto-Moderator Papan Permainan",
+  title: "Lembah Bayang: Werewolf Chronicles — Web Game & Companion",
   description:
-    "Aplikasi moderator otomatis permainan kartu Werewolf satu-layar (pass & play) tanpa perlu koneksi internet atau pemain yang berkorban jadi narator.",
-  keywords: ["werewolf", "board game", "auto-moderator", "pass and play", "werewolf indonesia"],
-  authors: [{ name: "Werewolf Team" }],
+    "Game deduksi sosial misteri Werewolf multipemain modern dengan bot AI, kartu ilustrasi gothic tarot, dan moderator otomatis.",
+  keywords: ["lembah bayang", "werewolf chronicles", "werewolf online", "board game indonesia", "auto-moderator"],
+  authors: [{ name: "Lembah Bayang Studio" }],
 };
 
 export const viewport: Viewport = {

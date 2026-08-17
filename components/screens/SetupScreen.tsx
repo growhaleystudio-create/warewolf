@@ -87,11 +87,16 @@ export function SetupScreen({ onStartGame }: SetupScreenProps) {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold uppercase tracking-wider">
           <Sparkles className="w-3.5 h-3.5" /> Auto-Moderator Papan Permainan
         </div>
-        <h1 className="font-serif text-3xl sm:text-5xl font-extrabold text-amber-100 tracking-wide">
-          WEREWOLF DESA
-        </h1>
-        <p className="text-stone-300 text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
-          Moderator digital satu layar untuk bermain bersama teman. Bagikan layar secara bergiliran tanpa ada pemain yang harus mengalah jadi narator.
+        <div className="space-y-1">
+          <h1 className="font-serif text-3xl sm:text-4xl font-black text-amber-100">
+            LEMBAH BAYANG
+          </h1>
+          <p className="text-xs text-amber-400 font-serif tracking-[0.2em] uppercase font-bold">
+            Werewolf Chronicles
+          </p>
+        </div>
+        <p className="text-stone-300 text-xs sm:text-sm max-w-md mx-auto">
+          Atur jumlah pemain dan aktifkan peran khusus untuk petualangan malam ini!
         </p>
       </div>
 
