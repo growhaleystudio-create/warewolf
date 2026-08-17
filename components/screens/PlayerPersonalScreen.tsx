@@ -16,6 +16,7 @@ import { Timer } from "../ui/Timer";
 import { RoleGuideModal } from "../ui/RoleGuideModal";
 import { ChatBox } from "../ui/ChatBox";
 import { PlayerStatusRoster } from "../ui/PlayerStatusRoster";
+import { StoryNarrativeModal } from "./StoryNarrativeModal";
 import { 
   Eye, 
   EyeOff, 
@@ -63,6 +64,8 @@ export function PlayerPersonalScreen({
   const [showSecretRoleModal, setShowSecretRoleModal] = useState(false);
   const [showRoleGuide, setShowRoleGuide] = useState(false);
   const [showFloatingChat, setShowFloatingChat] = useState(false);
+  const [showPrologue, setShowPrologue] = useState(true);
+  const [showEpilogue, setShowEpilogue] = useState(true);
   const [seerInspectionResult, setSeerInspectionResult] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [myVoteTargetId, setMyVoteTargetId] = useState<string | null>(null);
@@ -610,15 +613,29 @@ export function PlayerPersonalScreen({
             </div>
           </div>
 
-          {isHost && (
+          <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
             <button
               type="button"
-              onClick={onRestartGame}
-              className="w-full py-4 px-6 rounded-2xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-serif font-bold text-sm shadow-md"
+              onClick={() => {
+                audioEngine.playTap();
+                setShowEpilogue(true);
+              }}
+              className="flex-1 py-3 px-4 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 text-xs font-semibold text-amber-300 flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95"
             >
-              MAIN LAGI DI RUANGAN INI
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>📖 Baca Ulang Epilog Kemenangan</span>
             </button>
-          )}
+
+            {isHost && (
+              <button
+                type="button"
+                onClick={onRestartGame}
+                className="flex-1 py-3.5 px-6 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-serif font-bold text-xs shadow-md active:scale-95"
+              >
+                MAIN LAGI DI RUANGAN INI
+              </button>
+            )}
+          </div>
         </div>
       )}
         </div>
@@ -690,6 +707,21 @@ export function PlayerPersonalScreen({
 
       {/* Role Guide Modal */}
       <RoleGuideModal isOpen={showRoleGuide} onClose={() => setShowRoleGuide(false)} />
+
+      {/* Prologue Modal (Round 1 Night Start) */}
+      <StoryNarrativeModal
+        type="PROLOGUE"
+        isOpen={showPrologue && gameState.roundNumber === 1 && gameState.phase === "NIGHT"}
+        onContinue={() => setShowPrologue(false)}
+      />
+
+      {/* Epilogue Modal (Game Over Winner) */}
+      <StoryNarrativeModal
+        type="EPILOGUE"
+        winner={gameState.winner}
+        isOpen={showEpilogue && gameState.phase === "WINNER" && !!gameState.winner}
+        onContinue={() => setShowEpilogue(false)}
+      />
     </div>
   );
 }

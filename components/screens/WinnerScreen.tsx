@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { Player, GameLogEntry } from "@/lib/types";
 import { ROLES } from "@/lib/roles";
 import { RoleIcon } from "../illustrations/RoleIcon";
-import { Trophy, RotateCcw, Sliders, ScrollText, Sparkles } from "lucide-react";
+import { Trophy, RotateCcw, Sliders, ScrollText, Sparkles, BookOpen } from "lucide-react";
 import { audioEngine } from "@/lib/audioEngine";
+import { StoryNarrativeModal } from "./StoryNarrativeModal";
 
 interface WinnerScreenProps {
   winner: "VILLAGE" | "WEREWOLF" | "JESTER";
@@ -80,6 +81,7 @@ export function WinnerScreen({
     }
   };
 
+  const [showEpilogue, setShowEpilogue] = useState(true);
   const meta = getWinnerTitle();
 
   return (
@@ -98,7 +100,29 @@ export function WinnerScreen({
         <p className="text-stone-300 text-sm sm:text-base max-w-lg mx-auto">
           {meta.subtitle}
         </p>
+
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => {
+              audioEngine.playTap();
+              setShowEpilogue(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-800/90 hover:bg-stone-700 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-all shadow-md active:scale-95"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>📖 Baca Ulang Epilog Kemenangan</span>
+          </button>
+        </div>
       </div>
+
+      {/* Epilogue Narrative Modal */}
+      <StoryNarrativeModal
+        type="EPILOGUE"
+        winner={winner}
+        isOpen={showEpilogue}
+        onContinue={() => setShowEpilogue(false)}
+      />
 
       {/* Full Roles Reveal Grid */}
       <div className="bg-stone-900/80 border border-stone-700/80 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl backdrop-blur-md">
