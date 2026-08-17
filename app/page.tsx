@@ -2,40 +2,41 @@
 
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { RoleId, GameSettings, GameState } from "@/lib/types";
-import { RoomPlayer } from "@/lib/roomStore";
+import { GameState, RoleId, GameSettings, ChatMessage } from "@/lib/types";
 import { INITIAL_GAME_STATE } from "@/lib/gameReducer";
+import { RoomPlayer } from "@/lib/roomStore";
 import { LobbyAuthScreen } from "@/components/screens/LobbyAuthScreen";
 import { PlayerPersonalScreen } from "@/components/screens/PlayerPersonalScreen";
 import { AudioToggle } from "@/components/ui/AudioToggle";
 
-function WerewolfApp() {
+function WerewolfGameApp() {
   const searchParams = useSearchParams();
+  const queryRoom = searchParams.get("room");
+
   const [roomCode, setRoomCode] = useState<string | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
-  const [isHost, setIsHost] = useState<boolean>(false);
+  const [isHost, setIsHost] = useState(false);
   const [myPlayer, setMyPlayer] = useState<RoomPlayer | null>(null);
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAME_STATE);
-  const [playersInRoom, setPlayersInRoom] = useState<Array<{ id: string; name: string; isHost: boolean }>>([]);
   const [currentActiveRole, setCurrentActiveRole] = useState<RoleId | null>(null);
   const [teammateWerewolves, setTeammateWerewolves] = useState<string[]>([]);
+  const [playersInRoom, setPlayersInRoom] = useState<Array<{ id: string; name: string; isHost: boolean }>>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Restore saved session or read URL room code
+  // Restore session from localStorage on mount
   useEffect(() => {
-    const urlRoom = searchParams.get("room");
     const savedRoom = localStorage.getItem("WEREWOLF_MULTI_ROOM");
-    const savedPlayerId = localStorage.getItem("WEREWOLF_MULTI_PLAYER_ID");
+    const savedPlayer = localStorage.getItem("WEREWOLF_MULTI_PLAYER_ID");
 
-    if (savedRoom && savedPlayerId) {
+    if (savedRoom && savedPlayer) {
       setRoomCode(savedRoom);
-      setPlayerId(savedPlayerId);
-    } else if (urlRoom) {
-      setRoomCode(urlRoom.toUpperCase());
+      setPlayerId(savedPlayer);
+    } else if (queryRoom) {
+      setRoomCode(queryRoom.toUpperCase());
     }
-  }, [searchParams]);
+  }, [queryRoom]);
 
-  // Real-time synchronization polling (every 1.5 seconds)
+  // Polling Sync Room State every 1.5s
   const syncRoom = useCallback(async () => {
     if (!roomCode || !playerId) return;
 
@@ -43,23 +44,24 @@ function WerewolfApp() {
       const res = await fetch(`/api/rooms/${roomCode}?playerId=${playerId}`);
       if (!res.ok) {
         if (res.status === 404) {
-          // Room expired / deleted
           localStorage.removeItem("WEREWOLF_MULTI_ROOM");
           localStorage.removeItem("WEREWOLF_MULTI_PLAYER_ID");
           setRoomCode(null);
           setPlayerId(null);
+          setMyPlayer(null);
+          setGameState(INITIAL_GAME_STATE);
         }
         return;
       }
 
-      const json = await res.json();
-      if (json.success && json.data) {
-        const data = json.data;
-        setIsHost(data.isHost);
-        setMyPlayer(data.myPlayer);
-        setGameState(data.gameState);
-        setCurrentActiveRole(data.currentActiveRole);
-        setTeammateWerewolves(data.teammateWerewolves || []);
+      const data = await res.json();
+      setIsHost(data.isHost);
+      setMyPlayer(data.myPlayer);
+      setGameState(data.gameState);
+      setCurrentActiveRole(data.currentActiveRole);
+      setTeammateWerewolves(data.teammateWerewolves || []);
+
+      if (data.gameState.players) {
         setPlayersInRoom(
           data.gameState.players.map((p: { id: string; name: string }) => ({
             id: p.id,
@@ -69,24 +71,23 @@ function WerewolfApp() {
         );
       }
     } catch (err) {
-      console.error("Polling error:", err);
+      console.error("Room sync error:", err);
     }
   }, [roomCode, playerId]);
 
   useEffect(() => {
-    if (!roomCode || !playerId) return;
-    syncRoom();
-    const interval = setInterval(syncRoom, 1500);
-    return () => clearInterval(interval);
+    if (roomCode && playerId) {
+      syncRoom();
+      const interval = setInterval(syncRoom, 1500);
+      return () => clearInterval(interval);
+    }
   }, [roomCode, playerId, syncRoom]);
 
-  // Handlers
   const handleCreateRoom = async (
     hostName: string,
     settings: GameSettings,
     selectedRoles: RoleId[]
   ) => {
-    setErrorMessage(null);
     try {
       const res = await fetch("/api/rooms", {
         method: "POST",
@@ -97,24 +98,41 @@ function WerewolfApp() {
       if (json.success) {
         setRoomCode(json.roomCode);
         setPlayerId(json.hostPlayerId);
-        setIsHost(true);
         localStorage.setItem("WEREWOLF_MULTI_ROOM", json.roomCode);
         localStorage.setItem("WEREWOLF_MULTI_PLAYER_ID", json.hostPlayerId);
-      } else {
-        setErrorMessage(json.error || "Gagal membuat ruangan.");
       }
     } catch {
-      setErrorMessage("Koneksi gagal saat membuat ruangan.");
+      setErrorMessage("Gagal membuat ruangan baru.");
     }
   };
 
-  const handleJoinRoom = async (code: string, playerName: string) => {
-    setErrorMessage(null);
+  const handleStartSoloGame = async (playerName: string) => {
+    try {
+      const res = await fetch("/api/rooms/solo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerName }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setRoomCode(json.roomCode);
+        setPlayerId(json.playerId);
+        localStorage.setItem("WEREWOLF_MULTI_ROOM", json.roomCode);
+        localStorage.setItem("WEREWOLF_MULTI_PLAYER_ID", json.playerId);
+      } else {
+        setErrorMessage(json.error || "Gagal membuat game solo.");
+      }
+    } catch {
+      setErrorMessage("Koneksi gagal saat membuat game solo.");
+    }
+  };
+
+  const handleJoinRoom = async (code: string, name: string) => {
     try {
       const res = await fetch(`/api/rooms/${code}/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerName }),
+        body: JSON.stringify({ playerName: name }),
       });
       const json = await res.json();
       if (json.success) {
@@ -156,6 +174,20 @@ function WerewolfApp() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type, payload, playerId }),
+      });
+      syncRoom();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSendChatMessage = async (text: string) => {
+    if (!roomCode || !playerId) return;
+    try {
+      await fetch(`/api/rooms/${roomCode}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ senderId: playerId, text }),
       });
       syncRoom();
     } catch (err) {
@@ -213,6 +245,7 @@ function WerewolfApp() {
             onCreateRoom={handleCreateRoom}
             onJoinRoom={handleJoinRoom}
             onStartGame={handleStartGame}
+            onStartSoloGame={handleStartSoloGame}
             onAddBot={() => handleDispatchAction("ADD_BOT")}
             onLeaveRoom={handleLeaveRoom}
           />
@@ -225,6 +258,7 @@ function WerewolfApp() {
             currentActiveRole={currentActiveRole}
             teammateWerewolves={teammateWerewolves}
             onDispatchAction={handleDispatchAction}
+            onSendChatMessage={handleSendChatMessage}
             onRestartGame={handleRestartGame}
           />
         )}
@@ -235,7 +269,7 @@ function WerewolfApp() {
 
       {/* Footer Branding */}
       <footer className="relative z-10 text-center py-2 text-[11px] text-stone-500 font-mono">
-        Werewolf Online Desa • Multiplayer Multi-Perangkat
+        Werewolf Online Desa • Multiplayer Multi-Perangkat & AI Solo
       </footer>
     </main>
   );
@@ -248,7 +282,7 @@ export default function Home() {
         <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
       </div>
     }>
-      <WerewolfApp />
+      <WerewolfGameApp />
     </Suspense>
   );
 }

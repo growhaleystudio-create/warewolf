@@ -83,6 +83,15 @@ export interface GameLogEntry {
   timestamp: number;
 }
 
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  text: string;
+  isBot?: boolean;
+  timestamp: number;
+}
+
 export interface GameState {
   phase: GamePhase;
   roundNumber: number;
@@ -100,6 +109,7 @@ export interface GameState {
   hunterTriggerSource: 'NIGHT' | 'DAY' | null;
   hunterPlayerId: string | null;
   historyLogs: GameLogEntry[];
+  chatMessages?: ChatMessage[];
   currentDealPlayerIndex: number;
   isCardRevealed: boolean;
 }

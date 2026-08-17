@@ -3,7 +3,8 @@ import {
   RoleId, 
   GameSettings, 
   Player, 
-  NightStep 
+  NightStep,
+  ChatMessage 
 } from "./types";
 import { 
   gameReducer, 
@@ -11,7 +12,12 @@ import {
   DEFAULT_SETTINGS 
 } from "./gameReducer";
 import { getRecommendedRoles, assignRoles, ROLES } from "./roles";
-import { getRandomBotName, generateAIBotNightActions, generateAIBotVotes } from "./aiBotEngine";
+import { 
+  getRandomBotName, 
+  generateAIBotNightActions, 
+  generateAIBotVotes, 
+  generateAIBotChatDialogue 
+} from "./aiBotEngine";
 
 export interface RoomPlayer {
   id: string;
@@ -30,6 +36,8 @@ export interface GameRoom {
   settings: GameSettings;
   players: RoomPlayer[];
   gameState: GameState;
+  chatMessages: ChatMessage[];
+  lastBotChatTime: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -88,6 +96,17 @@ export function createRoom(
     selectedRoles: initialRoles,
     settings,
     players: [initialPlayer],
+    chatMessages: [
+      {
+        id: `chat-${Date.now()}-welcome`,
+        senderId: "system",
+        senderName: "Moderator Desa",
+        text: "Selamat datang di Balai Musyawarah Desa! Ruangan telah dibuka.",
+        isBot: true,
+        timestamp: Date.now(),
+      }
+    ],
+    lastBotChatTime: 0,
     gameState: {
       ...INITIAL_GAME_STATE,
       settings,
@@ -101,12 +120,32 @@ export function createRoom(
           isProtectedByBodyguard: false,
         },
       ],
+      chatMessages: [],
     },
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
 
   rooms.set(roomCode, newRoom);
+  return { roomCode, hostPlayerId };
+}
+
+/**
+ * 1-Klik Buat Game Solo vs AI
+ */
+export function createSoloGame(playerName: string): { roomCode: string; hostPlayerId: string } {
+  const { roomCode, hostPlayerId } = createRoom(playerName || "Pemain Utama", {
+    dayDiscussionDurationSec: 120,
+    nightActionDurationSec: 15,
+  });
+
+  // Tambahkan 6 AI Bot
+  for (let i = 0; i < 6; i++) {
+    addBotPlayerToRoom(roomCode, hostPlayerId);
+  }
+
+  // Langsung mulai game
+  startRoomGame(roomCode, hostPlayerId);
   return { roomCode, hostPlayerId };
 }
 
@@ -170,9 +209,6 @@ export function joinRoom(
   return { success: true, playerId: newPlayerId };
 }
 
-/**
- * Tambahkan Bot AI ke dalam Ruangan Lobby
- */
 export function addBotPlayerToRoom(roomCode: string, hostPlayerId: string): boolean {
   const room = rooms.get(roomCode.toUpperCase().trim());
   if (!room || room.hostPlayerId !== hostPlayerId) return false;
@@ -216,7 +252,6 @@ export function startRoomGame(roomCode: string, hostPlayerId: string): boolean {
   const playerNames = room.players.map((p) => p.name);
   const assigned = assignRoles(playerNames, room.selectedRoles);
 
-  // Sync assigned roles back to room.players
   room.players.forEach((p, idx) => {
     p.role = assigned[idx].role;
     p.isAlive = true;
@@ -231,7 +266,6 @@ export function startRoomGame(roomCode: string, hostPlayerId: string): boolean {
     },
   });
 
-  // Overwrite players in state to match room player IDs
   nextState.players = room.players.map((p) => ({
     id: p.id,
     name: p.name,
@@ -248,9 +282,48 @@ export function startRoomGame(roomCode: string, hostPlayerId: string): boolean {
   ) as NightStep[];
 
   room.gameState = nextState;
-
-  // Lakukan aksi bot jika peran pertama adalah bot
   triggerAIBotTurnIfApplicable(room);
+
+  room.updatedAt = Date.now();
+  return true;
+}
+
+export function addChatMessageToRoom(
+  roomCode: string,
+  senderId: string,
+  text: string
+): boolean {
+  const room = rooms.get(roomCode.toUpperCase().trim());
+  if (!room || !text.trim()) return false;
+
+  const sender = room.players.find((p) => p.id === senderId);
+  const senderName = sender ? sender.name : "Warga";
+
+  const newMsg: ChatMessage = {
+    id: `chat-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    senderId,
+    senderName,
+    text: text.trim(),
+    isBot: senderName.startsWith("Bot"),
+    timestamp: Date.now(),
+  };
+
+  room.chatMessages.push(newMsg);
+  room.gameState.chatMessages = room.chatMessages;
+
+  // Trigger possible AI response to user message
+  if (!newMsg.isBot) {
+    const aiResponse = generateAIBotChatDialogue(room.gameState, room.players, newMsg);
+    if (aiResponse) {
+      setTimeout(() => {
+        if (room.chatMessages) {
+          room.chatMessages.push(aiResponse);
+          room.gameState.chatMessages = room.chatMessages;
+          room.updatedAt = Date.now();
+        }
+      }, 1200);
+    }
+  }
 
   room.updatedAt = Date.now();
   return true;
@@ -265,6 +338,17 @@ function triggerAIBotTurnIfApplicable(room: GameRoom) {
         ...room.gameState.nightActions,
         ...botUpdates,
       };
+    }
+  } else if (room.gameState.phase === "DAY_DISCUSSION") {
+    // Generate autonomous bot dialogue in Day Discussion periodically
+    const now = Date.now();
+    if (now - room.lastBotChatTime > 5000) {
+      const dialogue = generateAIBotChatDialogue(room.gameState, room.players);
+      if (dialogue) {
+        room.chatMessages.push(dialogue);
+        room.gameState.chatMessages = room.chatMessages;
+        room.lastBotChatTime = now;
+      }
     }
   } else if (room.gameState.phase === "VOTING") {
     const botVotes = generateAIBotVotes(room.gameState, room.players);
@@ -283,7 +367,6 @@ export function dispatchActionToRoom(
   const nextState = gameReducer(room.gameState, action);
   room.gameState = nextState;
 
-  // Sync alive states back to room.players
   room.players.forEach((p) => {
     const matched = nextState.players.find((sp) => sp.id === p.id);
     if (matched) {
@@ -291,16 +374,12 @@ export function dispatchActionToRoom(
     }
   });
 
-  // Otomasi giliran bot AI berikutnya
   triggerAIBotTurnIfApplicable(room);
 
   room.updatedAt = Date.now();
   return true;
 }
 
-/**
- * Sanitasi data yang dikirim ke masing-masing HP pemain agar tidak bisa inspect-element
- */
 export function getSanitizedRoomForPlayer(
   roomCode: string,
   playerId: string
@@ -309,18 +388,23 @@ export function getSanitizedRoomForPlayer(
   isHost: boolean;
   myPlayer: RoomPlayer | null;
   gameState: GameState;
+  chatMessages: ChatMessage[];
   teammateWerewolves?: string[];
   currentActiveRole?: RoleId | null;
 } | null {
   const room = rooms.get(roomCode.toUpperCase().trim());
   if (!room) return null;
 
+  // Maintain bot periodic discussion if in DAY_DISCUSSION
+  if (room.gameState.phase === "DAY_DISCUSSION") {
+    triggerAIBotTurnIfApplicable(room);
+  }
+
   const myPlayer = room.players.find((p) => p.id === playerId) || null;
   const isHost = room.hostPlayerId === playerId;
   const isGameOver = room.gameState.phase === "WINNER";
   const myRole = myPlayer ? myPlayer.role : null;
 
-  // Mask player roles for security
   const sanitizedPlayers: Player[] = room.gameState.players.map((p) => {
     const shouldRevealRole =
       isGameOver ||
@@ -333,7 +417,6 @@ export function getSanitizedRoomForPlayer(
     };
   });
 
-  // Jika saya werewolf, cari nama sesama werewolf hidup
   let teammateWerewolves: string[] = [];
   if (myRole === "WEREWOLF") {
     teammateWerewolves = room.players
@@ -341,7 +424,6 @@ export function getSanitizedRoomForPlayer(
       .map((p) => p.name);
   }
 
-  // Cek peran apa yang sedang aktif di malam hari
   let currentActiveRole: RoleId | null = null;
   if (room.gameState.phase === "NIGHT") {
     currentActiveRole =
@@ -354,8 +436,10 @@ export function getSanitizedRoomForPlayer(
     myPlayer,
     teammateWerewolves,
     currentActiveRole,
+    chatMessages: room.chatMessages || [],
     gameState: {
       ...room.gameState,
+      chatMessages: room.chatMessages || [],
       players: sanitizedPlayers,
     },
   };

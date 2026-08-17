@@ -13,6 +13,7 @@ import { RoleIcon } from "../illustrations/RoleIcon";
 import { PlayerCard } from "../ui/PlayerCard";
 import { Timer } from "../ui/Timer";
 import { RoleGuideModal } from "../ui/RoleGuideModal";
+import { ChatBox } from "../ui/ChatBox";
 import { 
   Eye, 
   EyeOff, 
@@ -29,7 +30,8 @@ import {
   Crown,
   RotateCcw,
   Check,
-  BookOpen
+  BookOpen,
+  MessageSquare
 } from "lucide-react";
 import { audioEngine } from "@/lib/audioEngine";
 
@@ -41,6 +43,7 @@ interface PlayerPersonalScreenProps {
   currentActiveRole: RoleId | null;
   teammateWerewolves?: string[];
   onDispatchAction: (type: string, payload?: unknown) => void;
+  onSendChatMessage: (text: string) => void;
   onRestartGame: () => void;
 }
 
@@ -52,10 +55,12 @@ export function PlayerPersonalScreen({
   currentActiveRole,
   teammateWerewolves = [],
   onDispatchAction,
+  onSendChatMessage,
   onRestartGame,
 }: PlayerPersonalScreenProps) {
   const [showSecretRoleModal, setShowSecretRoleModal] = useState(false);
   const [showRoleGuide, setShowRoleGuide] = useState(false);
+  const [showFloatingChat, setShowFloatingChat] = useState(false);
   const [seerInspectionResult, setSeerInspectionResult] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [myVoteTargetId, setMyVoteTargetId] = useState<string | null>(null);
@@ -457,6 +462,16 @@ export function PlayerPersonalScreen({
             </div>
           </div>
 
+          {/* Embedded Interactive Village Chat Box with AI Bot Debates */}
+          <div className="pt-2">
+            <ChatBox
+              messages={gameState.chatMessages || []}
+              currentUserId={myPlayer.id}
+              currentUserName={myPlayer.name}
+              onSendMessage={onSendChatMessage}
+            />
+          </div>
+
           {isHost && (
             <button
               type="button"
@@ -578,6 +593,43 @@ export function PlayerPersonalScreen({
             </button>
           )}
         </div>
+      )}
+
+      {/* Floating Chat Modal (when opened outside DAY_DISCUSSION) */}
+      {showFloatingChat && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
+          <div className="w-full max-w-lg relative">
+            <button
+              type="button"
+              onClick={() => setShowFloatingChat(false)}
+              className="absolute -top-10 right-0 text-stone-300 hover:text-white text-xs font-bold px-3 py-1 bg-stone-800 rounded-full"
+            >
+              ✕ Tutup Chat
+            </button>
+            <ChatBox
+              messages={gameState.chatMessages || []}
+              currentUserId={myPlayer.id}
+              currentUserName={myPlayer.name}
+              onSendMessage={onSendChatMessage}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Floating Chat Toggle Button (when not in DAY_DISCUSSION) */}
+      {gameState.phase !== "DAY_DISCUSSION" && (
+        <button
+          type="button"
+          onClick={() => {
+            audioEngine.playTap();
+            setShowFloatingChat(!showFloatingChat);
+          }}
+          className="fixed bottom-16 right-4 z-40 p-3 rounded-full bg-indigo-950/90 hover:bg-indigo-900 text-indigo-300 border border-indigo-500/40 shadow-xl backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5"
+          title="Buka Chat Desa"
+        >
+          <MessageSquare className="w-5 h-5 text-amber-400" />
+          <span className="text-xs font-bold pr-1">Chat</span>
+        </button>
       )}
 
       {/* Role Guide Modal */}

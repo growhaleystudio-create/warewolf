@@ -16,7 +16,8 @@ import {
   ShieldCheck, 
   Crown,
   BookOpen,
-  Bot
+  Bot,
+  Gamepad2
 } from "lucide-react";
 import { audioEngine } from "@/lib/audioEngine";
 
@@ -28,6 +29,7 @@ interface LobbyAuthScreenProps {
   onCreateRoom: (hostName: string, settings: GameSettings, selectedRoles: RoleId[]) => void;
   onJoinRoom: (roomCode: string, playerName: string) => void;
   onStartGame: () => void;
+  onStartSoloGame?: (playerName: string) => void;
   onAddBot?: () => void;
   onLeaveRoom?: () => void;
 }
@@ -40,6 +42,7 @@ export function LobbyAuthScreen({
   onCreateRoom,
   onJoinRoom,
   onStartGame,
+  onStartSoloGame,
   onAddBot,
   onLeaveRoom,
 }: LobbyAuthScreenProps) {
@@ -86,6 +89,13 @@ export function LobbyAuthScreen({
       },
       selectedRoles
     );
+  };
+
+  const handleSoloClick = () => {
+    audioEngine.playBell();
+    if (onStartSoloGame) {
+      onStartSoloGame(playerName.trim() || "Pemain Utama");
+    }
   };
 
   const toggleSpecialRole = (roleId: RoleId) => {
@@ -197,7 +207,7 @@ export function LobbyAuthScreen({
             </span>
             {!isReadyToStart && (
               <span className="text-[11px] text-amber-400/80 font-medium">
-                (Butuh min. 5 pemain — gunakan Bot jika tes sendiri)
+                (Butuh min. 5 pemain — klik Tambah Bot jika main sendiri)
               </span>
             )}
           </div>
@@ -285,7 +295,21 @@ export function LobbyAuthScreen({
           Masuk dan bermain bersama teman dengan halaman dan peran rahasia di perangkat masing-masing!
         </p>
 
-        <div className="pt-2">
+        {/* Quick 1-Click Solo vs AI Button */}
+        {onStartSoloGame && (
+          <div className="pt-2 flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={handleSoloClick}
+              className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white font-serif font-bold text-sm tracking-wide shadow-xl shadow-indigo-500/25 border border-indigo-400/40 transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2.5"
+            >
+              <Gamepad2 className="w-5 h-5 text-amber-300" />
+              <span>🎮 MAIN SOLO VS BOT AI (1-KLIK INSTAN)</span>
+            </button>
+          </div>
+        )}
+
+        <div className="pt-1">
           <button
             type="button"
             onClick={() => {

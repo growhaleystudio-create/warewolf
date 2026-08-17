@@ -1,17 +1,29 @@
 /**
- * Procedural Web Audio API Sound Engine
- * Zero external MP3/WAV file dependencies — 100% synthesized sound waves
+ * Audio Engine: Web Audio API Synthesizer + HTML5 BGM Streaming
  */
 
 class AudioEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
-  private ambientGain: GainNode | null = null;
-  private currentAmbientType: 'NIGHT' | 'DAY' | null = null;
-  private ambientInterval: number | null = null;
+  private bgmAudio: HTMLAudioElement | null = null;
+  private isBgmPlaying: boolean = false;
 
   constructor() {
-    // Initialized lazily on first user gesture
+    if (typeof window !== "undefined") {
+      this.initBGM();
+    }
+  }
+
+  private initBGM() {
+    if (typeof window === "undefined" || this.bgmAudio) return;
+    try {
+      this.bgmAudio = new Audio("/audio/bgm.mp3");
+      this.bgmAudio.loop = true;
+      this.bgmAudio.volume = 0.22;
+      this.bgmAudio.preload = "none";
+    } catch (e) {
+      console.warn("BGM initialization deferred:", e);
+    }
   }
 
   private initContext(): AudioContext | null {
@@ -30,8 +42,13 @@ class AudioEngine {
 
   public setMuted(muted: boolean) {
     this.isMuted = muted;
-    if (this.ambientGain && this.ctx) {
-      this.ambientGain.gain.setValueAtTime(muted ? 0 : 0.15, this.ctx.currentTime);
+    if (this.bgmAudio) {
+      if (muted) {
+        this.bgmAudio.pause();
+        this.isBgmPlaying = false;
+      } else {
+        this.playBGM();
+      }
     }
   }
 
@@ -39,10 +56,32 @@ class AudioEngine {
     return this.isMuted;
   }
 
+  public playBGM() {
+    if (this.isMuted || typeof window === "undefined") return;
+    if (!this.bgmAudio) {
+      this.initBGM();
+    }
+    if (this.bgmAudio) {
+      this.bgmAudio.play().then(() => {
+        this.isBgmPlaying = true;
+      }).catch(() => {
+        // Autoplay may be blocked before first user gesture
+      });
+    }
+  }
+
+  public pauseBGM() {
+    if (this.bgmAudio) {
+      this.bgmAudio.pause();
+      this.isBgmPlaying = false;
+    }
+  }
+
   /**
    * Sound: Suara ketukan tombol / UI Tap
    */
   public playTap() {
+    this.playBGM(); // Start BGM on first interaction if not playing
     if (this.isMuted) return;
     const ctx = this.initContext();
     if (!ctx) return;
@@ -147,20 +186,19 @@ class AudioEngine {
       osc.stop(time + duration);
     };
 
-    // Lub-Dub
     playBeat(now, 75, 0.15, 0.35);
     playBeat(now + 0.18, 65, 0.18, 0.25);
   }
 
   /**
-   * Sound: Suara Malam Tiba (Chime Misteri)
+   * Sound: Suara Malam Tiba (Chime)
    */
   public playNightChime() {
     if (this.isMuted) return;
     const ctx = this.initContext();
     if (!ctx) return;
 
-    const notes = [220, 261.63, 329.63, 440]; // A Minor arpeggio
+    const notes = [220, 261.63, 329.63, 440];
     notes.forEach((note, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -189,10 +227,10 @@ class AudioEngine {
     if (!ctx) return;
 
     const melody = [
-      { note: 261.63, time: 0.0, dur: 0.15 }, // C4
-      { note: 329.63, time: 0.15, dur: 0.15 }, // E4
-      { note: 392.00, time: 0.30, dur: 0.15 }, // G4
-      { note: 523.25, time: 0.45, dur: 0.60 }, // C5
+      { note: 261.63, time: 0.0, dur: 0.15 },
+      { note: 329.63, time: 0.15, dur: 0.15 },
+      { note: 392.00, time: 0.30, dur: 0.15 },
+      { note: 523.25, time: 0.45, dur: 0.60 },
     ];
 
     melody.forEach(({ note, time, dur }) => {
@@ -214,47 +252,12 @@ class AudioEngine {
     });
   }
 
-  /**
-   * Sound: Suara Ambient Malam (Jangkrik lembut secara prosedural)
-   */
   public startAmbient(type: 'NIGHT' | 'DAY') {
-    if (this.currentAmbientType === type) return;
-    this.stopAmbient();
-    this.currentAmbientType = type;
-
-    if (typeof window === "undefined") return;
-
-    if (type === 'NIGHT') {
-      this.ambientInterval = window.setInterval(() => {
-        if (!this.isMuted && Math.random() > 0.4) {
-          const ctx = this.initContext();
-          if (!ctx) return;
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          const now = ctx.currentTime;
-
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(4600 + Math.random() * 400, now);
-
-          gain.gain.setValueAtTime(0.02, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-
-          osc.start(now);
-          osc.stop(now + 0.1);
-        }
-      }, 1200);
-    }
+    this.playBGM();
   }
 
   public stopAmbient() {
-    if (this.ambientInterval !== null && typeof window !== "undefined") {
-      clearInterval(this.ambientInterval);
-      this.ambientInterval = null;
-    }
-    this.currentAmbientType = null;
+    // No-op (handled by BGM)
   }
 }
 

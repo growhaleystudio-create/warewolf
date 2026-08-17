@@ -1,4 +1,4 @@
-import { GameState, RoleId, Player } from "./types";
+import { GameState, RoleId, Player, ChatMessage } from "./types";
 import { RoomPlayer } from "./roomStore";
 
 const BOT_NAMES = [
@@ -29,6 +29,93 @@ export function getRandomBotName(existingNames: string[]): string {
   return `Bot Warga ${existingNames.length + 1}`;
 }
 
+const ACCUSATION_TEMPLATES = [
+  "Aku curiga banget sama {target}, dari tadi diam aja dan gerak-geriknya gelisah!",
+  "Coba perhatikan {target}, argumennya aneh dan seperti mengalihkan isu!",
+  "Firasatku kuat {target} adalah salah satu serigala di antara kita.",
+  "Jangan terkecoh sama kepolosan {target}, kita harus selidiki dia!",
+  "Kenapa {target} gak pernah membela siapa-siapa? Sangat mencurigakan.",
+  "{target}, coba kasih alibi kamu semalam ngapain aja!",
+  "Menurut analisisku, Serigala kemungkinan besar adalah {target}!",
+];
+
+const DEFENSE_TEMPLATES = [
+  "Bukan aku serigalanya sumpah! Aku warga desa biasa yang mau desa kita menang!",
+  "Kenapa kalian malah nuduh aku? Kalau aku digantung, desa bakal rugi!",
+  "Tuduhan itu fitnah! Jangan sampai kita salah gantung warga tak bersalah!",
+  "Aku berani bersumpah demi desa, aku bukan serigala!",
+  "Kalian jangan termakan provokasi serigala asli yang mau menjebakku!",
+];
+
+const SEER_CALL_TEMPLATES = [
+  "Peramal semalam cek siapa? Tolong kasih kode atau petunjuk dong!",
+  "Ada yang punya info dari Peramal gak buat voting siang ini?",
+  "Jangan sampai kita salah gantung, Peramal ada kabar siapa yang bersih?",
+  "Siapa yang semalam diintip Peramal? Buka suara dong sebelum waktu habis!",
+];
+
+const COUNTER_TEMPLATES = [
+  "Kenapa {target} ngotot banget mau gantung orang? Jangan-jangan kamu serigalanya yang panik!",
+  "Orang yang paling berisik nuduh biasanya serigala aslinya! Hati-hati sama {target}.",
+  "Tunggu dulu, kenapa fokusnya ke aku? {target} jauh lebih mencurigakan dari kemarin!",
+];
+
+const USER_REACTION_TEMPLATES = [
+  "{user}, argumenmu masuk akal. Aku sependapat sama kamu!",
+  "Tunggu dulu {user}, kenapa kamu yakin banget? Ada bukti kuat?",
+  "Aku setuju sama {user}, ayo kita awasi pemain yang mencurigakan itu!",
+  "{user}, jangan-jangan kamu cuma mau cuci tangan ya?",
+];
+
+/**
+ * Generate a dynamic in-character chat message from an AI bot
+ */
+export function generateAIBotChatDialogue(
+  gameState: GameState,
+  roomPlayers: RoomPlayer[],
+  lastUserMsg?: ChatMessage
+): ChatMessage | null {
+  const aliveBots = roomPlayers.filter((rp) => rp.name.startsWith("Bot") && rp.isAlive);
+  if (aliveBots.length === 0) return null;
+
+  const randomBot = aliveBots[Math.floor(Math.random() * aliveBots.length)];
+  const aliveTargets = gameState.players.filter((p) => p.isAlive && p.id !== randomBot.id);
+  if (aliveTargets.length === 0) return null;
+
+  const randomTarget = aliveTargets[Math.floor(Math.random() * aliveTargets.length)];
+
+  let messageText = "";
+
+  // 1. React to human player's recent message if exists
+  if (lastUserMsg && Math.random() > 0.45 && !lastUserMsg.isBot) {
+    const tmpl = USER_REACTION_TEMPLATES[Math.floor(Math.random() * USER_REACTION_TEMPLATES.length)];
+    messageText = tmpl.replace("{user}", lastUserMsg.senderName);
+  } else {
+    // 2. Mix of accusations, defenses, seer calls
+    const randType = Math.random();
+    if (randType < 0.45) {
+      const tmpl = ACCUSATION_TEMPLATES[Math.floor(Math.random() * ACCUSATION_TEMPLATES.length)];
+      messageText = tmpl.replace("{target}", randomTarget.name);
+    } else if (randType < 0.70) {
+      const tmpl = COUNTER_TEMPLATES[Math.floor(Math.random() * COUNTER_TEMPLATES.length)];
+      messageText = tmpl.replace("{target}", randomTarget.name);
+    } else if (randType < 0.85) {
+      messageText = SEER_CALL_TEMPLATES[Math.floor(Math.random() * SEER_CALL_TEMPLATES.length)];
+    } else {
+      messageText = DEFENSE_TEMPLATES[Math.floor(Math.random() * DEFENSE_TEMPLATES.length)];
+    }
+  }
+
+  return {
+    id: `chat-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    senderId: randomBot.id,
+    senderName: randomBot.name,
+    text: messageText,
+    isBot: true,
+    timestamp: Date.now(),
+  };
+}
+
 /**
  * Otomatisasi Logika Keputusan Bot AI pada Fase Malam
  */
@@ -49,7 +136,6 @@ export function generateAIBotNightActions(
 
   switch (currentActiveStep) {
     case "WEREWOLF": {
-      // Werewolf AI target: pilih target hidup yang bukan serigala
       const nonWerewolves = alivePlayers.filter((p) => p.role !== "WEREWOLF");
       if (nonWerewolves.length > 0 && !gameState.nightActions.werewolfTargetId) {
         const randomTarget = nonWerewolves[Math.floor(Math.random() * nonWerewolves.length)];
@@ -59,7 +145,6 @@ export function generateAIBotNightActions(
     }
 
     case "SEER": {
-      // Seer AI: terawang target hidup selain dirinya
       const seerBot = botPlayersOfActiveRole[0];
       const otherAlive = alivePlayers.filter((p) => p.id !== seerBot.id);
       if (otherAlive.length > 0 && !gameState.nightActions.seerInspectedId) {
@@ -70,7 +155,6 @@ export function generateAIBotNightActions(
     }
 
     case "DOCTOR": {
-      // Doctor AI: sembuhkan pemain hidup secara acak
       if (alivePlayers.length > 0 && !gameState.nightActions.doctorTargetId) {
         const randomTarget = alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
         updates.doctorTargetId = randomTarget.id;
@@ -79,7 +163,6 @@ export function generateAIBotNightActions(
     }
 
     case "BODYGUARD": {
-      // Bodyguard AI: lindungi pemain hidup selain dirinya
       const bgBot = botPlayersOfActiveRole[0];
       const otherAlive = alivePlayers.filter((p) => p.id !== bgBot.id);
       if (otherAlive.length > 0 && !gameState.nightActions.bodyguardTargetId) {
@@ -90,7 +173,6 @@ export function generateAIBotNightActions(
     }
 
     case "WITCH": {
-      // Witch AI: jika serigala menyerang dan heal belum dipakai, ada 50% peluang menyelamatkan
       if (
         gameState.nightActions.werewolfTargetId &&
         !gameState.witchPotions.healUsed &&
@@ -117,7 +199,6 @@ export function generateAIBotVotes(
   const aliveBots = roomPlayers.filter((rp) => rp.name.startsWith("Bot") && rp.isAlive);
 
   aliveBots.forEach((bot) => {
-    // Cari calon target selain bot itu sendiri
     const validTargets = alivePlayers.filter((p) => p.id !== bot.id);
     if (validTargets.length > 0) {
       const chosen = validTargets[Math.floor(Math.random() * validTargets.length)];
