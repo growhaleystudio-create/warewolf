@@ -67,7 +67,7 @@ export function ChatBox({
       </div>
 
       {/* Messages Stream */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-3 max-h-64 sm:max-h-72 text-xs">
+      <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[180px] max-h-[70vh] lg:max-h-none text-xs">
         {messages.length === 0 ? (
           <div className="text-center py-6 text-stone-500 text-xs italic">
             Belum ada obrolan. Mulai diskusi atau tunggu warga lain bersuara!

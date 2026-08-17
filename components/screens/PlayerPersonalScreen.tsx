@@ -131,9 +131,12 @@ export function PlayerPersonalScreen({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-3 sm:p-6 space-y-5 animate-fadeIn">
-      {/* Personalized Player Header Bar */}
-      <div className="bg-stone-900/90 border border-stone-700/80 rounded-2xl p-3.5 flex items-center justify-between shadow-xl backdrop-blur-md">
+    <div className="w-full max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 animate-fadeIn">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Game Controller & Current Phase */}
+        <div className="lg:col-span-7 xl:col-span-8 space-y-5">
+          {/* Personalized Player Header Bar */}
+          <div className="bg-stone-900/90 border border-stone-700/80 rounded-2xl p-3.5 flex items-center justify-between shadow-xl backdrop-blur-md">
         <div className="flex items-center gap-2.5 truncate">
           <div className="w-10 h-10 rounded-full bg-stone-950 border border-amber-500/30 flex items-center justify-center p-1 shrink-0">
             <RoleIcon role={myPlayer.role} className="w-7 h-7" />
@@ -462,8 +465,8 @@ export function PlayerPersonalScreen({
             </div>
           </div>
 
-          {/* Embedded Interactive Village Chat Box with AI Bot Debates */}
-          <div className="pt-2">
+          {/* Mobile Only: Embedded Interactive Village Chat Box in Day Discussion */}
+          <div className="pt-2 lg:hidden">
             <ChatBox
               messages={gameState.chatMessages || []}
               currentUserId={myPlayer.id}
@@ -594,10 +597,23 @@ export function PlayerPersonalScreen({
           )}
         </div>
       )}
+        </div>
 
-      {/* Floating Chat Modal (when opened outside DAY_DISCUSSION) */}
+        {/* Right Column: Persistent Desktop Village Chat & AI Debates */}
+        <div className="hidden lg:block lg:col-span-5 xl:col-span-4 sticky top-6">
+          <ChatBox
+            className="h-[calc(100vh-4rem)] min-h-[580px] max-h-[820px]"
+            messages={gameState.chatMessages || []}
+            currentUserId={myPlayer.id}
+            currentUserName={myPlayer.name}
+            onSendMessage={onSendChatMessage}
+          />
+        </div>
+      </div>
+
+      {/* Mobile Only: Floating Chat Modal (when opened outside DAY_DISCUSSION) */}
       {showFloatingChat && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
+        <div className="lg:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
           <div className="w-full max-w-lg relative">
             <button
               type="button"
@@ -616,7 +632,7 @@ export function PlayerPersonalScreen({
         </div>
       )}
 
-      {/* Floating Chat Toggle Button (when not in DAY_DISCUSSION) */}
+      {/* Mobile Only: Floating Chat Toggle Button (when not in DAY_DISCUSSION) */}
       {gameState.phase !== "DAY_DISCUSSION" && (
         <button
           type="button"
@@ -624,7 +640,7 @@ export function PlayerPersonalScreen({
             audioEngine.playTap();
             setShowFloatingChat(!showFloatingChat);
           }}
-          className="fixed bottom-16 right-4 z-40 p-3 rounded-full bg-indigo-950/90 hover:bg-indigo-900 text-indigo-300 border border-indigo-500/40 shadow-xl backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5"
+          className="lg:hidden fixed bottom-16 right-4 z-40 p-3 rounded-full bg-indigo-950/90 hover:bg-indigo-900 text-indigo-300 border border-indigo-500/40 shadow-xl backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5"
           title="Buka Chat Desa"
         >
           <MessageSquare className="w-5 h-5 text-amber-400" />
