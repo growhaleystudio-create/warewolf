@@ -242,7 +242,12 @@ export function PlayerPersonalScreen({
               <Moon className="w-4 h-4 text-indigo-400" />
               <span>Fase Malam (Putaran {gameState.roundNumber})</span>
             </div>
-            <Timer durationSeconds={gameState.settings.nightActionDurationSec} isRunning={true} className="scale-75" />
+            <Timer
+              key={`night-timer-${gameState.roundNumber}-${gameState.activeNightStepIndex}`}
+              durationSeconds={gameState.settings.nightActionDurationSec || 20}
+              isRunning={true}
+              className="scale-75"
+            />
           </div>
 
           {/* If It's My Turn at Night */}
@@ -480,7 +485,11 @@ export function PlayerPersonalScreen({
           </div>
 
           <div className="flex justify-center">
-            <Timer durationSeconds={gameState.settings.dayDiscussionDurationSec} isRunning={true} />
+            <Timer
+              key={`day-timer-${gameState.roundNumber}`}
+              durationSeconds={gameState.settings.dayDiscussionDurationSec || 120}
+              isRunning={true}
+            />
           </div>
 
           <div className="space-y-2">
@@ -520,11 +529,20 @@ export function PlayerPersonalScreen({
       {/* PHASE 4: VOTING */}
       {gameState.phase === "VOTING" && (
         <div className="bg-stone-900/90 border border-stone-700/80 rounded-3xl p-5 sm:p-6 space-y-5 shadow-2xl backdrop-blur-md animate-fadeIn">
-          <div className="text-center space-y-1">
+          <div className="flex items-center justify-between border-b border-stone-800 pb-3">
             <div className="inline-flex items-center gap-1.5 text-red-400 text-xs font-bold uppercase">
               <Gavel className="w-3.5 h-3.5" />
               <span>Kotak Suara Rahasia di HP Anda</span>
             </div>
+            <Timer
+              key={`voting-timer-${gameState.roundNumber}`}
+              durationSeconds={45}
+              isRunning={true}
+              className="scale-75"
+            />
+          </div>
+
+          <div className="text-center space-y-1">
             <h3 className="font-serif text-2xl font-extrabold text-stone-100">Pilih Siapa yang Ingin Digantung:</h3>
           </div>
 

@@ -114,13 +114,17 @@ export function Timer({
       <div className="absolute flex flex-col items-center justify-center">
         <span
           className={`font-mono text-2xl font-bold tracking-wider ${
-            isLowTime ? "text-red-400 animate-bounce" : "text-amber-100"
+            timeLeft === 0
+              ? "text-red-400 font-extrabold"
+              : isLowTime
+              ? "text-red-400 animate-pulse"
+              : "text-amber-100"
           }`}
         >
           {formattedTime}
         </span>
-        <span className="text-[10px] uppercase tracking-widest text-amber-300/70 font-semibold">
-          {isRunning ? "Berjalan" : "Dijeda"}
+        <span className="text-[10px] uppercase tracking-widest font-semibold text-amber-300/70">
+          {timeLeft === 0 ? "Waktu Habis" : isRunning ? "Berjalan" : "Dijeda"}
         </span>
       </div>
     </div>

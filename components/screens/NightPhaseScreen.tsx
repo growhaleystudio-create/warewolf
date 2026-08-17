@@ -140,6 +140,7 @@ export function NightPhaseScreen({
           </div>
 
           <Timer
+            key={`night-step-${activeStepIndex}`}
             durationSeconds={durationSeconds}
             isRunning={true}
             onComplete={handleNextStep}
