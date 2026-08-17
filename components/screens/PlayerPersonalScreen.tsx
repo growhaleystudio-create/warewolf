@@ -88,6 +88,21 @@ export function PlayerPersonalScreen({
     }
   }, [gameState.phase, gameState.roundNumber]);
 
+  // Reset status voting saat masuk ke fase baru atau ronde baru
+  useEffect(() => {
+    if (gameState.phase !== "VOTING") {
+      setHasVoted(false);
+      setMyVoteTargetId(null);
+    }
+  }, [gameState.phase, gameState.roundNumber]);
+
+  // Reset hasil terawang peramal saat fase malam berganti
+  useEffect(() => {
+    if (gameState.phase !== "NIGHT" || currentActiveRole !== "SEER") {
+      setSeerInspectionResult(null);
+    }
+  }, [gameState.phase, currentActiveRole, gameState.roundNumber]);
+
   const myRoleDef = ROLES[myPlayer.role];
   const isMyTurnAtNight = gameState.phase === "NIGHT" && currentActiveRole === myPlayer.role && myPlayer.isAlive;
   const alivePlayers = gameState.players.filter((p) => p.isAlive);
