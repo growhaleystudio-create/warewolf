@@ -14,6 +14,7 @@ import { PlayerCard } from "../ui/PlayerCard";
 import { Timer } from "../ui/Timer";
 import { RoleGuideModal } from "../ui/RoleGuideModal";
 import { ChatBox } from "../ui/ChatBox";
+import { PlayerStatusRoster } from "../ui/PlayerStatusRoster";
 import { 
   Eye, 
   EyeOff, 
@@ -599,10 +600,16 @@ export function PlayerPersonalScreen({
       )}
         </div>
 
-        {/* Right Column: Persistent Desktop Village Chat & AI Debates */}
-        <div className="hidden lg:block lg:col-span-5 xl:col-span-4 sticky top-6">
+        {/* Right Column: Player Status Board & Village Chat on Desktop */}
+        <div className="hidden lg:block lg:col-span-5 xl:col-span-4 sticky top-6 space-y-4">
+          <PlayerStatusRoster
+            players={gameState.players}
+            currentUserId={myPlayer.id}
+            isGameOver={gameState.phase === "WINNER"}
+          />
+
           <ChatBox
-            className="h-[calc(100vh-4rem)] min-h-[580px] max-h-[820px]"
+            className="h-[calc(100vh-18rem)] min-h-[420px] max-h-[620px]"
             messages={gameState.chatMessages || []}
             currentUserId={myPlayer.id}
             currentUserName={myPlayer.name}
@@ -611,17 +618,27 @@ export function PlayerPersonalScreen({
         </div>
       </div>
 
-      {/* Mobile Only: Floating Chat Modal (when opened outside DAY_DISCUSSION) */}
+      {/* Mobile Only: Floating Chat & Roster Modal (when opened outside DAY_DISCUSSION) */}
       {showFloatingChat && (
         <div className="lg:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
-          <div className="w-full max-w-lg relative">
-            <button
-              type="button"
-              onClick={() => setShowFloatingChat(false)}
-              className="absolute -top-10 right-0 text-stone-300 hover:text-white text-xs font-bold px-3 py-1 bg-stone-800 rounded-full"
-            >
-              ✕ Tutup Chat
-            </button>
+          <div className="w-full max-w-lg space-y-3 relative max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-amber-300">Status & Obrolan Desa</span>
+              <button
+                type="button"
+                onClick={() => setShowFloatingChat(false)}
+                className="text-stone-300 hover:text-white text-xs font-bold px-3 py-1 bg-stone-800 rounded-full"
+              >
+                ✕ Tutup
+              </button>
+            </div>
+
+            <PlayerStatusRoster
+              players={gameState.players}
+              currentUserId={myPlayer.id}
+              isGameOver={gameState.phase === "WINNER"}
+            />
+
             <ChatBox
               messages={gameState.chatMessages || []}
               currentUserId={myPlayer.id}
