@@ -253,11 +253,11 @@ export function PlayerPersonalScreen({
 
       {/* PHASE 1: NIGHT PHASE */}
       {gameState.phase === "NIGHT" && (
-        <div className="bg-slate-900/90 border-2 border-indigo-500/30 rounded-3xl p-5 sm:p-6 space-y-5 shadow-2xl backdrop-blur-md">
+        <div className="bg-stone-900/90 border-2 border-amber-500/30 rounded-3xl p-5 sm:p-6 space-y-5 shadow-2xl backdrop-blur-md">
           {/* Phase Header */}
-          <div className="flex items-center justify-between border-b border-indigo-950 pb-3">
-            <div className="flex items-center gap-2 text-indigo-300 text-xs font-semibold uppercase">
-              <Moon className="w-4 h-4 text-indigo-400" />
+          <div className="flex items-center justify-between border-b border-stone-800 pb-3">
+            <div className="flex items-center gap-2 text-amber-300 text-xs font-semibold uppercase">
+              <Moon className="w-4 h-4 text-amber-400" />
               <span>Fase Malam (Putaran {gameState.roundNumber})</span>
             </div>
             <Timer
@@ -291,7 +291,7 @@ export function PlayerPersonalScreen({
                     ))}
                   </div>
                   {seerInspectionResult && (
-                    <div className="p-3 bg-cyan-950/90 border border-cyan-500/60 rounded-xl text-center text-sm font-bold text-cyan-200 animate-bounce">
+                    <div className="p-3 bg-amber-950/90 border border-amber-500/60 rounded-xl text-center text-sm font-bold text-amber-200 animate-bounce">
                       {seerInspectionResult}
                     </div>
                   )}
@@ -301,7 +301,7 @@ export function PlayerPersonalScreen({
               {/* Werewolf Night View */}
               {myPlayer.role === "WEREWOLF" && (
                 <div className="space-y-3">
-                  <p className="text-xs text-center text-red-300">Tentukan 1 mangsa malam ini bersama kawanan:</p>
+                  <p className="text-xs text-center text-stone-300">Pilih 1 korban warga yang ingin dimangsa:</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {alivePlayers.filter((p) => p.role !== "WEREWOLF").map((p) => (
                       <PlayerCard
@@ -319,7 +319,7 @@ export function PlayerPersonalScreen({
               {/* Doctor Night View */}
               {myPlayer.role === "DOCTOR" && (
                 <div className="space-y-3">
-                  <p className="text-xs text-center text-emerald-300">Pilih 1 pemain untuk diobati & diselamatkan:</p>
+                  <p className="text-xs text-center text-stone-300">Pilih 1 pemain untuk disembuhkan malam ini:</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {alivePlayers.map((p) => (
                       <PlayerCard
@@ -337,7 +337,7 @@ export function PlayerPersonalScreen({
               {/* Bodyguard Night View */}
               {myPlayer.role === "BODYGUARD" && (
                 <div className="space-y-3">
-                  <p className="text-xs text-center text-blue-300">Pilih 1 pemain lain untuk dilindungi:</p>
+                  <p className="text-xs text-center text-amber-300">Pilih 1 pemain lain untuk dilindungi:</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {alivePlayers.filter((p) => p.id !== myPlayer.id).map((p) => (
                       <PlayerCard
@@ -356,14 +356,14 @@ export function PlayerPersonalScreen({
               {myPlayer.role === "WITCH" && (
                 <div className="space-y-3 text-center">
                   <div className="p-3 bg-stone-950 rounded-xl border border-stone-800 text-xs">
-                    Korban Serigala: <span className="text-red-400 font-bold">{gameState.players.find(p => p.id === gameState.nightActions.werewolfTargetId)?.name || "Belum ada"}</span>
+                    Korban Serigala: <span className="text-amber-400 font-bold">{gameState.players.find(p => p.id === gameState.nightActions.werewolfTargetId)?.name || "Belum ada"}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       disabled={gameState.witchPotions.healUsed || !gameState.nightActions.werewolfTargetId}
                       onClick={handleWitchHealToggle}
-                      className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs font-semibold disabled:opacity-40"
+                      className="p-3 rounded-xl bg-amber-950/60 border border-amber-500/40 text-amber-300 text-xs font-semibold disabled:opacity-40"
                     >
                       {gameState.nightActions.witchHealTargetId ? "Batalkan Sembuh" : "Gunakan Ramuan Sembuh"}
                     </button>
@@ -371,7 +371,7 @@ export function PlayerPersonalScreen({
                       disabled={gameState.witchPotions.poisonUsed}
                       value={gameState.nightActions.witchPoisonTargetId || ""}
                       onChange={(e) => handleWitchPoison(e.target.value || null)}
-                      className="bg-stone-950 border border-purple-500/50 rounded-xl p-2 text-xs text-stone-200 disabled:opacity-40"
+                      className="bg-stone-950 border border-amber-500/50 rounded-xl p-2 text-xs text-stone-200 disabled:opacity-40"
                     >
                       <option value="">-- Opsi Racun --</option>
                       {alivePlayers.map((p) => (
@@ -385,17 +385,17 @@ export function PlayerPersonalScreen({
           ) : (
             /* Not My Turn: Atmospheric Sleep Screen with clear active step indicators */
             <div className="text-center py-6 sm:py-8 space-y-4">
-              <div className="w-16 h-16 mx-auto rounded-full bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center text-indigo-300 animate-pulse shadow-inner">
+              <div className="w-16 h-16 mx-auto rounded-full bg-stone-950/90 border border-amber-500/30 flex items-center justify-center text-amber-300 animate-pulse shadow-inner">
                 <Moon className="w-8 h-8" />
               </div>
               <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 text-xs font-bold">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-950/90 border border-amber-500/40 text-amber-300 text-xs font-bold">
                   <span>🌙 Langkah {gameState.activeNightStepIndex + 1} dari {gameState.currentNightSteps.length}</span>
                 </div>
-                <h3 className="font-serif text-xl font-extrabold text-indigo-100">
+                <h3 className="font-serif text-xl font-extrabold text-amber-100">
                   {currentActiveRole ? `Giliran ${ROLES[currentActiveRole]?.name} Beraksi...` : "Mata Terpejam..."}
                 </h3>
-                <p className="text-xs text-indigo-300/80 max-w-sm mx-auto">
+                <p className="text-xs text-stone-300 max-w-sm mx-auto">
                   {currentActiveRole 
                     ? `Peran ${ROLES[currentActiveRole]?.name} sedang menentukan target di keheningan malam.`
                     : "Malam sedang berlangsung. Tunggu giliran peran Anda dipanggil."}
@@ -406,8 +406,8 @@ export function PlayerPersonalScreen({
 
           {/* Host Next Step Controller */}
           {isHost && (
-            <div className="pt-4 border-t border-indigo-950/80 flex flex-col sm:flex-row items-center justify-between gap-2.5">
-              <span className="text-[11px] text-indigo-300/80 font-medium">
+            <div className="pt-4 border-t border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-2.5">
+              <span className="text-[11px] text-stone-300 font-medium">
                 Kontrol Host:
               </span>
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
@@ -417,7 +417,7 @@ export function PlayerPersonalScreen({
                     audioEngine.playTap();
                     onDispatchAction("ADVANCE_NIGHT_STEP");
                   }}
-                  className="flex-1 sm:flex-initial py-3 px-4 rounded-xl bg-indigo-700/80 hover:bg-indigo-600 text-white font-serif font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                  className="flex-1 sm:flex-initial py-3 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-serif font-black text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5"
                 >
                   <span>Lanjut Langkah ({gameState.activeNightStepIndex + 1}/{gameState.currentNightSteps.length})</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -752,7 +752,7 @@ export function PlayerPersonalScreen({
             audioEngine.playTap();
             setShowFloatingChat(!showFloatingChat);
           }}
-          className="lg:hidden fixed bottom-16 right-4 z-40 p-3 rounded-full bg-indigo-950/90 hover:bg-indigo-900 text-indigo-300 border border-indigo-500/40 shadow-xl backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5"
+          className="lg:hidden fixed bottom-16 right-4 z-40 p-3 rounded-full bg-stone-900/95 hover:bg-stone-800 text-amber-300 border border-amber-500/40 shadow-xl backdrop-blur-md transition-all active:scale-95 flex items-center gap-1.5"
           title="Buka Chat Desa"
         >
           <MessageSquare className="w-5 h-5 text-amber-400" />

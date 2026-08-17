@@ -43,23 +43,7 @@ export function RoleIllustration({
   if (imageSrc && !imgError) {
     return (
       <div
-        className={`relative rounded-3xl overflow-hidden shadow-2xl border-2 transition-all group ${sizeClasses} ${className} ${
-          role === "WEREWOLF"
-            ? "border-red-500/70 shadow-red-950/60"
-            : role === "SEER"
-            ? "border-purple-500/70 shadow-purple-950/60"
-            : role === "DOCTOR"
-            ? "border-emerald-500/70 shadow-emerald-950/60"
-            : role === "BODYGUARD"
-            ? "border-amber-500/70 shadow-amber-950/60"
-            : role === "WITCH"
-            ? "border-fuchsia-500/70 shadow-fuchsia-950/60"
-            : role === "HUNTER"
-            ? "border-orange-500/70 shadow-orange-950/60"
-            : role === "JESTER"
-            ? "border-pink-500/70 shadow-pink-950/60"
-            : "border-stone-500/70 shadow-stone-950/60"
-        }`}
+        className={`relative rounded-3xl overflow-hidden shadow-2xl border-2 border-amber-500/70 shadow-amber-950/60 transition-all group ${sizeClasses} ${className}`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img

@@ -75,8 +75,8 @@ export function WinnerScreen({
           title: "ORANG GILA (JESTER) MENANG!",
           subtitle: "Jester berhasil memperdaya seluruh desa untuk menggantung dirinya!",
           badge: "🎭 Kemenangan Tunggal Jester",
-          color: "from-purple-600 to-pink-600 text-purple-300",
-          border: "border-purple-500/50",
+          color: "from-amber-500 to-yellow-600 text-amber-300",
+          border: "border-amber-500/50",
         };
     }
   };
@@ -137,22 +137,20 @@ export function WinnerScreen({
             return (
               <div
                 key={player.id}
-                className={`p-4 rounded-2xl border flex flex-col items-center text-center space-y-2 ${
+                className={`p-4 rounded-2xl border flex flex-col items-center text-center space-y-2 transition-all ${
                   player.isAlive
-                    ? "bg-stone-950/80 border-stone-700"
-                    : "bg-stone-950/40 border-stone-900 opacity-70"
+                    ? "bg-stone-950/80 border-stone-700 text-stone-100 shadow-md"
+                    : "bg-stone-950/40 border-stone-800/50 opacity-60 text-stone-500"
                 }`}
               >
-                <RoleIcon role={player.role} className="w-12 h-12" />
-                <span className="font-bold text-sm text-stone-100">{player.name}</span>
+                <div className="w-12 h-12 rounded-full bg-stone-900 border border-stone-700 flex items-center justify-center p-2">
+                  <RoleIcon role={player.role} className="w-8 h-8" />
+                </div>
+                <div className="font-serif font-bold text-sm truncate max-w-full">
+                  {player.name}
+                </div>
                 <span
-                  className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${
-                    roleDef.faction === "WEREWOLF"
-                      ? "bg-red-950/60 text-red-300 border-red-500/40"
-                      : roleDef.faction === "NEUTRAL"
-                      ? "bg-purple-950/60 text-purple-300 border-purple-500/40"
-                      : "bg-emerald-950/60 text-emerald-300 border-emerald-500/40"
-                  }`}
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border bg-stone-950 text-amber-300 border-amber-500/40`}
                 >
                   {roleDef.name}
                 </span>

@@ -35,10 +35,10 @@ export function PlayerStatusRoster({
           </span>
         </div>
         <div className="flex items-center gap-2 text-[10px] font-bold">
-          <span className="px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
-            🟢 {aliveCount} Hidup
+          <span className="px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/30">
+            ● {aliveCount} Hidup
           </span>
-          <span className="px-2 py-0.5 rounded-full bg-red-950/80 text-red-300 border border-red-500/30">
+          <span className="px-2 py-0.5 rounded-full bg-stone-950 text-stone-400 border border-stone-800">
             💀 {deadCount} Gugur
           </span>
         </div>
@@ -93,10 +93,10 @@ export function PlayerStatusRoster({
               <div className="shrink-0">
                 {isAlive ? (
                   <span
-                    className="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-400"
+                    className="inline-flex items-center gap-0.5 text-[9px] font-bold text-amber-400"
                     title="Masih Hidup"
                   >
-                    <CheckCircle2 className="w-3 h-3" />
+                    <CheckCircle2 className="w-3 h-3 text-amber-400" />
                   </span>
                 ) : (
                   <span

@@ -301,9 +301,9 @@ export function LobbyAuthScreen({
             <button
               type="button"
               onClick={handleSoloClick}
-              className="w-full py-3 sm:py-3.5 px-4 sm:px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white font-serif font-bold text-xs sm:text-sm tracking-wide shadow-xl shadow-indigo-500/25 border border-indigo-400/40 transition-all hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-4 sm:px-6 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-stone-950 font-serif font-extrabold text-xs sm:text-sm tracking-wide shadow-xl shadow-amber-950/60 border border-amber-400/60 transition-all hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2"
             >
-              <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 shrink-0" />
+              <Gamepad2 className="w-4 h-4 sm:w-5 sm:h-5 text-stone-950 shrink-0" />
               <span className="whitespace-nowrap">Main Solo vs Bot AI (1-Klik Instan)</span>
             </button>
           </div>

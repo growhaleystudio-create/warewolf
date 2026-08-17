@@ -158,7 +158,7 @@ export function SetupScreen({ onStartGame }: SetupScreenProps) {
               <>
                 <div className="h-6 w-px bg-stone-800" />
                 <div className="text-center">
-                  <div className="text-purple-400 font-bold text-base">1</div>
+                  <div className="text-amber-400 font-bold text-base">1</div>
                   <div className="text-stone-400 text-[11px]">Netral</div>
                 </div>
               </>

@@ -147,13 +147,7 @@ export function RoleGuideModal({ isOpen, onClose }: RoleGuideModalProps) {
               <div className="flex-1 text-center sm:text-left">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                   <h4 className="font-serif text-2xl font-extrabold text-amber-200">{roleDef.name}</h4>
-                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
-                    roleDef.faction === "WEREWOLF"
-                      ? "bg-red-950 text-red-300 border-red-500/40"
-                      : roleDef.faction === "NEUTRAL"
-                      ? "bg-purple-950 text-purple-300 border-purple-500/40"
-                      : "bg-emerald-950 text-emerald-300 border-emerald-500/40"
-                  }`}>
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full border bg-stone-950 text-amber-300 border-amber-500/40">
                     {roleDef.faction === "WEREWOLF" ? "Faksi Serigala" : roleDef.faction === "NEUTRAL" ? "Faksi Netral" : "Faksi Desa"}
                   </span>
                 </div>
@@ -163,8 +157,8 @@ export function RoleGuideModal({ isOpen, onClose }: RoleGuideModalProps) {
 
             {/* Night Ability */}
             <div className="p-3.5 bg-stone-950/70 rounded-2xl border border-stone-800 space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 Kemampuan & Aksi Malam:
               </span>
               <p className="text-xs text-stone-200 leading-relaxed">{roleInfo.nightAbility}</p>
@@ -173,7 +167,7 @@ export function RoleGuideModal({ isOpen, onClose }: RoleGuideModalProps) {
             {/* Strategy */}
             <div className="p-3.5 bg-stone-950/70 rounded-2xl border border-stone-800 space-y-1">
               <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5" />
+                <Shield className="w-3.5 h-3.5 text-amber-400" />
                 Tips Strategi Bermain:
               </span>
               <p className="text-xs text-stone-200 leading-relaxed">{roleInfo.strategy}</p>
@@ -181,8 +175,8 @@ export function RoleGuideModal({ isOpen, onClose }: RoleGuideModalProps) {
 
             {/* Win Condition */}
             <div className="p-3.5 bg-stone-950/70 rounded-2xl border border-stone-800 space-y-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
-                <Trophy className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
                 Kondisi Kemenangan:
               </span>
               <p className="text-xs text-stone-200 leading-relaxed">{roleInfo.winCondition}</p>

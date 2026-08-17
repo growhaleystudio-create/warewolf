@@ -63,7 +63,7 @@ export function ChatBox({
             Balai Musyawarah (Chat Desa & Tuduhan AI)
           </span>
         </div>
-        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-500/40 font-bold">
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/40 font-bold">
           Live AI Debate
         </span>
       </div>
@@ -97,13 +97,13 @@ export function ChatBox({
               >
                 <div className="flex items-center gap-1.5 text-[10px] text-stone-400 font-medium">
                   {msg.isBot ? (
-                    <span className="inline-flex items-center gap-1 text-indigo-300 font-bold">
-                      <Bot className="w-3 h-3" />
+                    <span className="inline-flex items-center gap-1 text-amber-300/90 font-bold">
+                      <Bot className="w-3 h-3 text-amber-400" />
                       {msg.senderName}
                     </span>
                   ) : (
-                    <span className={`inline-flex items-center gap-1 font-bold ${isMe ? "text-amber-300" : "text-emerald-300"}`}>
-                      <User className="w-3 h-3" />
+                    <span className={`inline-flex items-center gap-1 font-bold ${isMe ? "text-amber-300" : "text-stone-300"}`}>
+                      <User className="w-3 h-3 text-amber-400" />
                       {msg.senderName} {isMe && "(Anda)"}
                     </span>
                   )}
@@ -112,9 +112,9 @@ export function ChatBox({
                 <div
                   className={`p-2.5 px-3.5 rounded-2xl max-w-[85%] leading-relaxed ${
                     isMe
-                      ? "bg-amber-500 text-stone-950 font-medium rounded-tr-none shadow-md"
+                      ? "bg-amber-500 text-stone-950 font-bold rounded-tr-none shadow-md"
                       : msg.isBot
-                      ? "bg-stone-950/90 border border-indigo-500/30 text-stone-200 rounded-tl-none"
+                      ? "bg-stone-950/90 border border-amber-500/30 text-stone-200 rounded-tl-none"
                       : "bg-stone-800 border border-stone-700 text-stone-100 rounded-tl-none"
                   }`}
                 >

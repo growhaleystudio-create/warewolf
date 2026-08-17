@@ -110,27 +110,27 @@ export function NightPhaseScreen({
     <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 space-y-6 animate-fadeIn">
       {/* Night Sky Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 text-xs font-semibold uppercase tracking-wider">
-          <Moon className="w-3.5 h-3.5 fill-indigo-400" />
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-950/90 border border-amber-500/40 text-amber-300 text-xs font-semibold uppercase tracking-wider">
+          <Moon className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
           <span>Fase Malam — Putaran {roundNumber}</span>
         </div>
 
-        <h2 className="font-serif text-3xl sm:text-4xl font-extrabold text-indigo-100 flex items-center justify-center gap-3">
+        <h2 className="font-serif text-3xl sm:text-4xl font-extrabold text-amber-100 flex items-center justify-center gap-3">
           <span>MALAM TELAH TIBA</span>
         </h2>
-        <p className="text-indigo-200/70 text-xs sm:text-sm">
+        <p className="text-stone-300 text-xs sm:text-sm">
           Semua pemain wajib memejamkan mata. Hanya peran yang dipanggil yang boleh membuka mata dan beraksi.
         </p>
       </div>
 
       {/* Role Action Container */}
-      <div className="bg-slate-900/90 border-2 border-indigo-500/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
+      <div className="bg-stone-900/90 border-2 border-amber-500/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl backdrop-blur-md relative overflow-hidden">
         {/* Step Indicator */}
-        <div className="flex items-center justify-between border-b border-indigo-950 pb-4">
+        <div className="flex items-center justify-between border-b border-stone-800 pb-4">
           <div className="flex items-center gap-3">
             {currentStep && <RoleIcon role={currentStep} className="w-10 h-10" />}
             <div>
-              <span className="text-xs text-indigo-400 uppercase font-semibold tracking-wider">
+              <span className="text-xs text-amber-400 uppercase font-semibold tracking-wider">
                 Giliran Peran:
               </span>
               <h3 className="font-serif text-xl sm:text-2xl font-bold text-amber-200">
@@ -167,9 +167,9 @@ export function NightPhaseScreen({
 
             {/* Inspection Reveal Popup */}
             {seerResult && (
-              <div className="p-4 bg-indigo-950/90 border border-cyan-500/60 rounded-2xl text-center space-y-2 animate-bounce">
-                <span className="text-xs text-cyan-300 font-semibold uppercase">Hasil Penerawangan:</span>
-                <p className="font-serif text-lg font-bold text-cyan-100">{seerResult}</p>
+              <div className="p-4 bg-amber-950/90 border border-amber-500/60 rounded-2xl text-center space-y-2 animate-bounce">
+                <span className="text-xs text-amber-300 font-semibold uppercase">Hasil Penerawangan:</span>
+                <p className="font-serif text-lg font-bold text-amber-100">{seerResult}</p>
               </div>
             )}
           </div>
@@ -177,27 +177,29 @@ export function NightPhaseScreen({
 
         {currentStep === "WEREWOLF" && (
           <div className="space-y-4">
-            <p className="text-sm text-red-300 text-center">
-              Kawanan Serigala, tentukan 1 mangsa malam ini:
+            <p className="text-sm text-stone-300 text-center">
+              Pilih 1 pemain yang ingin dimangsa kawanan serigala:
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {alivePlayers.map((player) => (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  isSelected={nightActions.werewolfTargetId === player.id}
-                  onSelect={() => handleWerewolfSelect(player)}
-                  badgeText={nightActions.werewolfTargetId === player.id ? "TARGET" : undefined}
-                />
-              ))}
+              {alivePlayers
+                .filter((p) => p.role !== "WEREWOLF")
+                .map((player) => (
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    isSelected={nightActions.werewolfTargetId === player.id}
+                    onSelect={() => handleWerewolfSelect(player)}
+                    badgeText={nightActions.werewolfTargetId === player.id ? "MANGSA" : undefined}
+                  />
+                ))}
             </div>
           </div>
         )}
 
         {currentStep === "DOCTOR" && (
           <div className="space-y-4">
-            <p className="text-sm text-emerald-300 text-center">
-              Dokter, pilih 1 pemain untuk diobati & diselamatkan:
+            <p className="text-sm text-stone-300 text-center">
+              Pilih 1 pemain yang ingin disembuhkan & dilindungi malam ini:
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {alivePlayers.map((player) => (
@@ -206,7 +208,7 @@ export function NightPhaseScreen({
                   player={player}
                   isSelected={nightActions.doctorTargetId === player.id}
                   onSelect={() => handleDoctorSelect(player)}
-                  badgeText={nightActions.doctorTargetId === player.id ? "DISEMBUHKAN" : undefined}
+                  badgeText={nightActions.doctorTargetId === player.id ? "SEMBUH" : undefined}
                 />
               ))}
             </div>
@@ -215,56 +217,58 @@ export function NightPhaseScreen({
 
         {currentStep === "BODYGUARD" && (
           <div className="space-y-4">
-            <p className="text-sm text-blue-300 text-center">
-              Bodyguard, pilih 1 pemain untuk dilindungi malam ini:
+            <p className="text-sm text-stone-300 text-center">
+              Pilih 1 pemain lain yang ingin dijaga dan dilindungi:
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {alivePlayers.map((player) => (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  isSelected={nightActions.bodyguardTargetId === player.id}
-                  onSelect={() => handleBodyguardSelect(player)}
-                  badgeText={nightActions.bodyguardTargetId === player.id ? "DILINDUNGI" : undefined}
-                />
-              ))}
+              {alivePlayers
+                .filter((p) => p.role !== "BODYGUARD")
+                .map((player) => (
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    isSelected={nightActions.bodyguardTargetId === player.id}
+                    onSelect={() => handleBodyguardSelect(player)}
+                    badgeText={nightActions.bodyguardTargetId === player.id ? "LINDUNGI" : undefined}
+                  />
+                ))}
             </div>
           </div>
         )}
 
         {currentStep === "WITCH" && (
           <div className="space-y-6">
-            {/* Werewolf Victim Intel */}
-            <div className="p-4 bg-stone-950/80 rounded-2xl border border-stone-800 text-center space-y-1">
-              <span className="text-xs text-stone-400 font-medium uppercase">Korban Serigala Malam Ini:</span>
-              <p className="text-base font-serif font-bold text-red-400">
-                {werewolfTargetPlayer
-                  ? werewolfTargetPlayer.name
-                  : "Tidak ada korban yang diserang"}
+            <div className="p-4 rounded-2xl bg-stone-950 border border-stone-800 text-center space-y-1">
+              <span className="text-xs text-stone-400 font-semibold uppercase">
+                Korban Serigala Malam Ini:
+              </span>
+              <p className="font-serif text-lg font-bold text-amber-300">
+                {werewolfTargetPlayer ? werewolfTargetPlayer.name : "Tidak ada korban terpilih"}
               </p>
             </div>
 
-            {/* Witch Potion Controls */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Heal Potion */}
-              <div className="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 space-y-3 text-center">
-                <div className="flex items-center justify-center gap-2 text-emerald-300 font-semibold text-sm">
-                  <Heart className="w-4 h-4" />
+              {/* Healing Potion */}
+              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-3 text-center">
+                <div className="flex items-center justify-center gap-2 text-amber-300 font-semibold text-sm">
+                  <Heart className="w-4 h-4 text-amber-400" />
                   <span>Ramuan Penyembuh</span>
                 </div>
                 <p className="text-xs text-stone-300">
                   {witchPotions.healUsed
-                    ? "Ramuan sudah habis terpakai."
-                    : "Selamatkan korban serigala malam ini."}
+                    ? "Ramuan penyembuh sudah habis."
+                    : werewolfTargetPlayer
+                    ? `Selamatkan ${werewolfTargetPlayer.name}?`
+                    : "Tidak ada korban serigala."}
                 </p>
                 <button
                   type="button"
                   disabled={witchPotions.healUsed || !werewolfTargetPlayer}
                   onClick={handleWitchHealToggle}
-                  className={`w-full py-2.5 px-4 rounded-xl font-semibold text-xs transition-all ${
+                  className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs transition-all ${
                     nightActions.witchHealTargetId
-                      ? "bg-emerald-500 text-stone-950 shadow-md"
-                      : "bg-emerald-900/60 hover:bg-emerald-800 text-emerald-200 border border-emerald-500/40"
+                      ? "bg-amber-500 text-stone-950 shadow-md"
+                      : "bg-stone-900 hover:bg-stone-800 text-amber-200 border border-amber-500/40"
                   } disabled:opacity-40 disabled:cursor-not-allowed`}
                 >
                   {nightActions.witchHealTargetId ? "BATALKAN SEMBUH" : "GUNAKAN RAMUAN SEMBUH"}
@@ -272,9 +276,9 @@ export function NightPhaseScreen({
               </div>
 
               {/* Poison Potion */}
-              <div className="p-4 rounded-2xl bg-purple-950/40 border border-purple-500/40 space-y-3 text-center">
-                <div className="flex items-center justify-center gap-2 text-purple-300 font-semibold text-sm">
-                  <Skull className="w-4 h-4" />
+              <div className="p-4 rounded-2xl bg-stone-950/80 border border-stone-800 space-y-3 text-center">
+                <div className="flex items-center justify-center gap-2 text-amber-300 font-semibold text-sm">
+                  <Skull className="w-4 h-4 text-amber-400" />
                   <span>Ramuan Racun</span>
                 </div>
                 <p className="text-xs text-stone-300">
@@ -286,7 +290,7 @@ export function NightPhaseScreen({
                   disabled={witchPotions.poisonUsed}
                   value={nightActions.witchPoisonTargetId || ""}
                   onChange={(e) => handleWitchPoisonSelect(e.target.value || null)}
-                  className="w-full bg-stone-950 border border-purple-500/50 rounded-xl px-3 py-2 text-xs text-stone-200 focus:outline-none focus:border-purple-400 disabled:opacity-40"
+                  className="w-full bg-stone-950 border border-amber-500/50 rounded-xl px-3 py-2 text-xs text-stone-200 focus:outline-none focus:border-amber-400 disabled:opacity-40"
                 >
                   <option value="">-- Tidak Menggunakan Racun --</option>
                   {alivePlayers.map((p) => (
@@ -301,11 +305,11 @@ export function NightPhaseScreen({
         )}
 
         {/* Advance Button */}
-        <div className="pt-4 border-t border-indigo-950 flex justify-end">
+        <div className="pt-4 border-t border-stone-800 flex justify-end">
           <button
             type="button"
             onClick={handleNextStep}
-            className="w-full sm:w-auto py-3 px-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-serif font-bold text-sm tracking-wide shadow-lg shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto py-3.5 px-8 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-serif font-black text-sm tracking-wide shadow-lg shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>
