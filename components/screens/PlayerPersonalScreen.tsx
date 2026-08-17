@@ -280,6 +280,15 @@ export function PlayerPersonalScreen({
               durationSeconds={gameState.settings.nightActionDurationSec || 20}
               isRunning={true}
               className="scale-75"
+              onComplete={() => {
+                if (isHost) {
+                  if (gameState.activeNightStepIndex < gameState.currentNightSteps.length - 1) {
+                    onDispatchAction("ADVANCE_NIGHT_STEP");
+                  } else {
+                    onDispatchAction("RESOLVE_NIGHT");
+                  }
+                }
+              }}
             />
           </div>
 
@@ -522,6 +531,11 @@ export function PlayerPersonalScreen({
               key={`day-timer-${gameState.roundNumber}`}
               durationSeconds={gameState.settings.dayDiscussionDurationSec || 120}
               isRunning={true}
+              onComplete={() => {
+                if (isHost) {
+                  onDispatchAction("START_VOTING");
+                }
+              }}
             />
           </div>
 
@@ -572,6 +586,11 @@ export function PlayerPersonalScreen({
               durationSeconds={45}
               isRunning={true}
               className="scale-75"
+              onComplete={() => {
+                if (isHost) {
+                  onDispatchAction("RESOLVE_VOTING");
+                }
+              }}
             />
           </div>
 

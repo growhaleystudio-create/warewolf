@@ -21,6 +21,7 @@ export function Timer({
   const [timeLeft, setTimeLeft] = useState(durationSeconds);
   const onCompleteRef = useRef(onComplete);
   const onTickRef = useRef(onTick);
+  const hasTriggeredCompleteRef = useRef(false);
 
   useEffect(() => {
     onCompleteRef.current = onComplete;
@@ -32,6 +33,7 @@ export function Timer({
 
   useEffect(() => {
     setTimeLeft(durationSeconds);
+    hasTriggeredCompleteRef.current = false;
   }, [durationSeconds]);
 
   // Handle countdown interval
@@ -60,7 +62,8 @@ export function Timer({
       audioEngine.playHeartbeat();
     }
 
-    if (timeLeft === 0) {
+    if (timeLeft === 0 && !hasTriggeredCompleteRef.current) {
+      hasTriggeredCompleteRef.current = true;
       audioEngine.playBell();
       if (onCompleteRef.current) {
         onCompleteRef.current();
